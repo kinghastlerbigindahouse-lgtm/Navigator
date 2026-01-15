@@ -2,1510 +2,718 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1a1a2e">
-    <title>📍 Навигатор с чувствительной стрелкой</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Навигатор по карте</title>
     <style>
-        /* iOS-совместимые стили */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%;
-            -webkit-font-smoothing: antialiased;
+            touch-action: manipulation;
         }
-
-        html {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #000;
-            color: white;
-            height: 100vh;
-            height: -webkit-fill-available;
-            width: 100vw;
             overflow: hidden;
-            position: fixed;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
-        }
-
-        /* Контейнер приложения */
-        .app-container {
-            display: flex;
-            flex-direction: column;
             height: 100vh;
-            height: -webkit-fill-available;
             width: 100vw;
-            background: #000;
+        }
+        
+        .container {
             position: relative;
-        }
-
-        /* Заголовок навигатора */
-        .nav-header {
-            padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-        }
-
-        .nav-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #FF2D55, #FF375F);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .nav-text h1 {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-text p {
-            font-size: 13px;
-            opacity: 0.7;
-            margin-top: 2px;
-        }
-
-        /* Кнопка загрузки карты */
-        .nav-upload-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-upload-btn:active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(0.95);
-        }
-
-        /* Основной контент */
-        .main-content {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
-
-        /* Контейнер карты */
-        .map-container {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
-            overflow: hidden;
-            touch-action: none;
         }
-
+        
         #mapCanvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: block;
-            background: #000;
+            background: #2c3e50;
+            cursor: grab;
         }
-
-        /* Холст для следа */
-        .arrow-trail {
+        
+        #arrow {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 90;
-            pointer-events: none;
-        }
-
-        #trailCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* Стрелка местоположения - УВЕЛИЧЕНА для лучшей видимости */
-        .location-arrow {
-            position: absolute;
-            width: 80px;
+            top: 50%;
+            left: 50%;
+            width: 60px;
             height: 80px;
-            z-index: 100;
+            transform-origin: center 80%;
+            transition: transform 0.1s ease-out;
             pointer-events: none;
-            filter: drop-shadow(0 0 15px rgba(255, 45, 85, 0.7));
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform: translate(-50%, -50%);
+            z-index: 10;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
         }
-
-        .arrow-icon {
+        
+        .arrow-shape {
             width: 100%;
             height: 100%;
         }
-
-        /* Панель координат */
-        .coordinates-panel {
+        
+        .controls {
             position: absolute;
-            bottom: 120px;
-            left: 16px;
-            right: 16px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 50;
-        }
-
-        .coord-row {
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .coord-label {
-            opacity: 0.7;
-        }
-
-        .coord-value {
-            font-family: 'Menlo', 'Monaco', monospace;
-            font-weight: 600;
-            color: #FF2D55;
-        }
-
-        /* Нижняя панель управления */
-        .control-panel {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 10px;
             z-index: 100;
         }
-
-        .control-btn {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
+        
+        .button {
+            background: linear-gradient(135deg, #007AFF, #0056CC);
+            color: white;
             border: none;
-            border-radius: 12px;
-            padding: 12px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-touch-callout: none;
-            user-select: none;
-        }
-
-        .control-btn:active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(0.95);
-        }
-
-        .control-btn i {
-            font-size: 20px;
-        }
-
-        .control-btn span {
-            font-size: 11px;
+            padding: 14px;
+            border-radius: 15px;
+            font-size: 17px;
             font-weight: 500;
-        }
-
-        .control-btn.active {
-            background: linear-gradient(135deg, #FF2D55, #FF375F);
-        }
-
-        .control-btn.tracking {
-            background: linear-gradient(135deg, #32D74B, #30D158);
-        }
-
-        /* Индикаторы */
-        .indicators {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 50;
-        }
-
-        .indicator {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .indicator i {
-            font-size: 16px;
-        }
-
-        .indicator.good i { color: #32D74B; }
-        .indicator.warning i { color: #FF9500; }
-        .indicator.error i { color: #FF453A; }
-
-        .indicator span {
-            opacity: 0.9;
-        }
-
-        /* Масштаб */
-        .zoom-controls {
-            position: absolute;
-            right: 16px;
-            bottom: 200px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 50;
-        }
-
-        .zoom-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 24px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-        }
-
-        .zoom-btn:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Настройки чувствительности */
-        .sensitivity-settings {
-            position: absolute;
-            top: 100px;
-            left: 16px;
-            background: rgba(0, 0, 0, 0.9);
+            gap: 8px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 12px;
-            z-index: 50;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .button:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .button-secondary {
+            background: rgba(40, 40, 40, 0.9);
+        }
+        
+        .button-danger {
+            background: linear-gradient(135deg, #FF3B30, #D70015);
+        }
+        
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 15px;
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 180px;
+            gap: 4px;
         }
-
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .slider-label {
+        
+        .sensor-data {
             display: flex;
             justify-content: space-between;
             font-size: 13px;
+            color: #8E8E93;
         }
-
-        .slider-label span:first-child {
-            opacity: 0.8;
+        
+        .sensor-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-
-        .slider-label span:last-child {
-            color: #FF2D55;
-            font-weight: 600;
+        
+        #mapUpload {
+            display: none;
         }
-
-        .sensitivity-slider {
+        
+        .instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 300px;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .instructions p {
+            margin: 10px 0;
+            line-height: 1.4;
+            color: #8E8E93;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .calibration {
+            position: absolute;
+            bottom: 120px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .calibration.hidden {
+            display: none;
+        }
+        
+        .calibration button {
+            margin-top: 10px;
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #8E8E93;
+        }
+        
+        input[type="range"] {
             width: 100%;
             height: 4px;
             -webkit-appearance: none;
-            appearance: none;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             border-radius: 2px;
-            outline: none;
         }
-
-        .sensitivity-slider::-webkit-slider-thumb {
+        
+        input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: #FF2D55;
+            background: #007AFF;
             cursor: pointer;
-            border: 3px solid white;
-            box-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
         }
-
-        .toggle-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            padding: 6px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .toggle-btn.active {
-            background: rgba(255, 45, 85, 0.5);
-        }
-
-        /* Уведомления */
-        .notification {
-            position: fixed;
-            top: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 14px 20px;
-            border-radius: 14px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            max-width: 300px;
-            width: auto;
-        }
-
-        .notification.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .notification i {
-            font-size: 18px;
-        }
-
-        .notification.success i { color: #32D74B; }
-        .notification.error i { color: #FF453A; }
-        .notification.warning i { color: #FF9500; }
-
-        /* Загрузчик */
-        .loader {
-            position: fixed;
+        
+        .map-grid {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s;
+            z-index: 1;
         }
-
-        .loader.show {
-            opacity: 1;
-            pointer-events: all;
+        
+        .grid-line {
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 1;
         }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #FF2D55;
+        
+        .position-marker {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FF3B30;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Анимации для стрелки */
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        @keyframes moveDetection {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            25% { transform: translate(-50%, -50%) scale(1.3); }
-            50% { transform: translate(-50%, -50%) scale(1); }
-            75% { transform: translate(-50%, -50%) scale(1.3); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        .move-detected {
-            animation: moveDetection 1s ease;
-        }
-
-        /* Адаптация */
-        @media (max-height: 700px) {
-            .coordinates-panel {
-                bottom: 100px;
-                padding: 12px;
-            }
-            
-            .control-panel {
-                padding: 12px;
-            }
-            
-            .control-btn {
-                padding: 10px;
-            }
-            
-            .location-arrow {
-                width: 70px;
-                height: 70px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .control-btn span {
-                font-size: 10px;
-            }
-            
-            .coordinates-panel {
-                left: 8px;
-                right: 8px;
-            }
-            
-            .sensitivity-settings {
-                width: 160px;
-                left: 8px;
-            }
+            transform: translate(-50%, -50%);
+            z-index: 5;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Заголовок приложения -->
-        <div class="nav-header">
-            <div class="nav-title">
-                <div class="nav-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div class="nav-text">
-                    <h1>Чувствительный навигатор</h1>
-                    <p>Стрелка реагирует на малейшие перемещения</p>
-                </div>
-            </div>
-            <button class="nav-upload-btn" id="navUploadBtn" title="Загрузить карту">
-                <i class="fas fa-map"></i>
-            </button>
-            <input type="file" id="mapUpload" accept="image/*" style="display: none;">
+    <div class="container">
+        <canvas id="mapCanvas"></canvas>
+        <svg class="map-grid" id="grid"></svg>
+        <div id="arrow">
+            <svg class="arrow-shape" viewBox="0 0 100 100">
+                <defs>
+                    <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#007AFF;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0056CC;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <polygon points="50,15 85,85 50,65 15,85" fill="url(#arrowGradient)"/>
+                <circle cx="50" cy="50" r="10" fill="#0056CC"/>
+            </svg>
         </div>
-
-        <!-- Основное содержимое -->
-        <div class="main-content">
-            <!-- Контейнер карты -->
-            <div class="map-container" id="mapContainer">
-                <canvas id="mapCanvas"></canvas>
-                <!-- Холст для следа -->
-                <div class="arrow-trail">
-                    <canvas id="trailCanvas"></canvas>
-                </div>
-                
-                <!-- Стрелка местоположения (УВЕЛИЧЕНА) -->
-                <div class="location-arrow" id="locationArrow">
-                    <svg class="arrow-icon" viewBox="0 0 100 100">
-                        <defs>
-                            <radialGradient id="arrowGrad" cx="50%" cy="50%">
-                                <stop offset="0%" stop-color="#FF2D55"/>
-                                <stop offset="50%" stop-color="#FF375F"/>
-                                <stop offset="100%" stop-color="#FF1B40"/>
-                            </radialGradient>
-                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="4" result="blur"/>
-                                <feMerge>
-                                    <feMergeNode in="blur"/>
-                                    <feMergeNode in="blur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <!-- Основная стрелка -->
-                        <path d="M50 10 L65 50 L50 90 L35 50 Z" 
-                              fill="url(#arrowGrad)" 
-                              stroke="#FFFFFF" 
-                              stroke-width="3"
-                              filter="url(#glow)"/>
-                        <!-- Внутренняя подсветка -->
-                        <path d="M50 20 L58 50 L50 80 L42 50 Z" 
-                              fill="#FFFFFF" 
-                              opacity="0.3"/>
-                        <!-- Центральный круг -->
-                        <circle cx="50" cy="50" r="15" fill="#FFFFFF" opacity="0.2"/>
-                        <circle cx="50" cy="50" r="8" fill="#FFFFFF" opacity="0.8"/>
-                        <!-- Внешнее свечение -->
-                        <circle cx="50" cy="50" r="25" fill="none" stroke="#FF2D55" stroke-width="2" opacity="0.3"/>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Индикаторы -->
-            <div class="indicators">
-                <div class="indicator" id="gpsStatus">
-                    <i class="fas fa-satellite"></i>
-                    <span>GPS: Поиск сигнала...</span>
-                </div>
-                <div class="indicator" id="movementStatus">
-                    <i class="fas fa-running"></i>
-                    <span>Движение: не обнаружено</span>
-                </div>
-            </div>
-
-            <!-- Настройки чувствительности -->
-            <div class="sensitivity-settings" id="sensitivitySettings">
-                <div class="slider-container">
-                    <div class="slider-label">
-                        <span>Чувствительность:</span>
-                        <span id="sensitivityValue">10x</span>
-                    </div>
-                    <input type="range" min="1" max="20" value="10" class="sensitivity-slider" id="sensitivitySlider">
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="toggle-btn" id="turboModeBtn">
-                        <i class="fas fa-rocket"></i> Турбо
-                    </button>
-                    <button class="toggle-btn" id="smoothModeBtn">
-                        <i class="fas fa-wave-square"></i> Сглаживание
-                    </button>
-                </div>
-            </div>
-
-            <!-- Управление масштабом -->
-            <div class="zoom-controls">
-                <button class="zoom-btn" id="zoomIn">
-                    <i class="fas fa-plus"></i>
-                </button>
-                <button class="zoom-btn" id="zoomOut">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button class="zoom-btn" id="resetView">
-                    <i class="fas fa-crosshairs"></i>
-                </button>
-            </div>
-
-            <!-- Панель координат -->
-            <div class="coordinates-panel">
-                <div class="coord-row">
-                    <span class="coord-label">Смещение X:</span>
-                    <span class="coord-value" id="offsetX">0 px</span>
-                </div>
-                <div class="coord-row">
-                    <span class="coord-label">Смещение Y:</span>
-                    <span class="coord-value" id="offsetY">0 px</span>
-                </div>
-                <div class="coord-row">
-                    <span class="coord-label">Прогресс:</span>
-                    <span class="coord-value" id="progress">0%</span>
-                </div>
-                <div class="coord-row">
-                    <span class="coord-label">Активность:</span>
-                    <span class="coord-value" id="activity">0%</span>
-                </div>
+        
+        <div class="status-bar">
+            <div id="statusText">Загрузите карту для начала</div>
+            <div class="sensor-data">
+                <span class="sensor-item">📍 <span id="posX">0</span>, <span id="posY">0</span></span>
+                <span class="sensor-item">🧭 <span id="heading">0°</span></span>
+                <span class="sensor-item">⚡ <span id="movement">0</span></span>
             </div>
         </div>
-
-        <!-- Нижняя панель управления -->
-        <div class="control-panel">
-            <button class="control-btn active" id="startTrackingBtn">
-                <i class="fas fa-play"></i>
-                <span>Старт</span>
-            </button>
-            <button class="control-btn" id="boostBtn">
-                <i class="fas fa-bolt"></i>
-                <span>Усилить</span>
-            </button>
-            <button class="control-btn" id="resetBtn">
-                <i class="fas fa-redo"></i>
-                <span>Сброс</span>
-            </button>
-            <button class="control-btn" id="statsBtn">
-                <i class="fas fa-chart-line"></i>
-                <span>Статистика</span>
-            </button>
+        
+        <div class="instructions" id="instructions">
+            <button class="close-btn" onclick="hideInstructions()">×</button>
+            <h3>Инструкция</h3>
+            <p>1. Загрузите фотографию карты местности</p>
+            <p>2. Разрешите доступ к датчикам телефона</p>
+            <p>3. Наклоняйте телефон для поворота стрелки</p>
+            <p>4. Двигайтесь для перемещения по карте</p>
+            <button class="button" onclick="hideInstructions()">Понятно</button>
         </div>
-
-        <!-- Уведомления -->
-        <div class="notification" id="notification">
-            <i class="fas fa-info-circle"></i>
-            <span id="notificationText">Сообщение</span>
+        
+        <div class="calibration hidden" id="calibrationPanel">
+            <div>Калибровка датчиков</div>
+            <div class="slider-container">
+                <label>Чувствительность движения: <span id="sensitivityValue">5</span></label>
+                <input type="range" id="sensitivitySlider" min="1" max="10" value="5">
+            </div>
+            <button class="button button-secondary" onclick="calibrateSensors()">Калибровать</button>
         </div>
-
-        <!-- Загрузчик -->
-        <div class="loader" id="loader">
-            <div class="spinner"></div>
+        
+        <div class="controls">
+            <input type="file" id="mapUpload" accept="image/*">
+            <button class="button" onclick="document.getElementById('mapUpload').click()">
+                📁 Загрузить карту
+            </button>
+            <button class="button button-secondary" onclick="toggleCalibration()">
+                ⚙️ Настройки
+            </button>
+            <button class="button button-secondary" onclick="resetPosition()">
+                🎯 Центрировать
+            </button>
         </div>
     </div>
 
     <script>
-        // Код приложения с повышенной чувствительностью стрелки
-        class SensitiveNavigator {
-            constructor() {
-                this.canvas = document.getElementById('mapCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.trailCanvas = document.getElementById('trailCanvas');
-                this.trailCtx = this.trailCanvas.getContext('2d');
-                this.locationArrow = document.getElementById('locationArrow');
-                
-                this.userImage = null;
-                this.imagePosition = { x: 0, y: 0 };
-                this.scale = 1;
-                this.minScale = 0.1;
-                this.maxScale = 3;
-                
-                // Позиция стрелки
-                this.arrowPosition = { x: 0, y: 0 };
-                this.trailPoints = [];
-                
-                // Настройки чувствительности
-                this.sensitivity = 10; // Увеличенная чувствительность (1-20)
-                this.turboMode = false;
-                this.smoothMode = true;
-                this.trackingActive = false;
-                this.boostActive = false;
-                this.watchId = null;
-                
-                // Данные движения
-                this.movementHistory = [];
-                this.lastAcceleration = { x: 0, y: 0, z: 0 };
-                this.lastPosition = null;
-                this.totalMovement = 0;
-                this.movementThreshold = 0.05; // Низкий порог для обнаружения движения
-                
-                // Статистика
-                this.startTime = null;
-                this.movementCount = 0;
-                this.lastMovementTime = 0;
-                
-                this.init();
+        // Основные элементы
+        const mapCanvas = document.getElementById('mapCanvas');
+        const ctx = mapCanvas.getContext('2d');
+        const arrow = document.getElementById('arrow');
+        const mapUpload = document.getElementById('mapUpload');
+        const statusText = document.getElementById('statusText');
+        const grid = document.getElementById('grid');
+        const instructions = document.getElementById('instructions');
+        
+        // Элементы отображения данных
+        const posXElement = document.getElementById('posX');
+        const posYElement = document.getElementById('posY');
+        const headingElement = document.getElementById('heading');
+        const movementElement = document.getElementById('movement');
+        const sensitivitySlider = document.getElementById('sensitivitySlider');
+        const sensitivityValue = document.getElementById('sensitivityValue');
+        const calibrationPanel = document.getElementById('calibrationPanel');
+        
+        // Состояние приложения
+        let mapImage = null;
+        let currentPosition = { x: 0, y: 0 };
+        let mapOffset = { x: 0, y: 0 };
+        let mapScale = 1;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let lastOffset = { x: 0, y: 0 };
+        
+        // Данные сенсоров
+        let alpha = 0; // Компас (0-360)
+        let beta = 0;  // Наклон вперед/назад (-180 до 180)
+        let gamma = 0; // Наклон влево/вправо (-90 до 90)
+        
+        // Фильтры для сглаживания
+        let smoothedGamma = 0;
+        let lastAcceleration = { x: 0, y: 0, z: 0 };
+        let velocity = { x: 0, y: 0 };
+        let positionHistory = [];
+        
+        // Настройки
+        let movementSensitivity = 5;
+        let isCalibrating = false;
+        let calibrationOffset = { x: 0, y: 0 };
+        
+        // Инициализация
+        function init() {
+            resizeCanvas();
+            setupEventListeners();
+            setupGrid();
+            updateStatus('Загрузите фотографию карты');
+            
+            // Показать инструкции при первом запуске
+            if (!localStorage.getItem('instructionsShown')) {
+                instructions.style.display = 'block';
             }
             
-            init() {
-                this.resizeCanvas();
-                window.addEventListener('resize', () => this.resizeCanvas());
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(() => this.resizeCanvas(), 100);
-                });
-                
-                this.setupEventListeners();
-                this.centerArrow();
-                
-                // Устанавливаем высокую чувствительность по умолчанию
-                document.getElementById('sensitivitySlider').value = this.sensitivity;
-                document.getElementById('sensitivityValue').textContent = `${this.sensitivity}x`;
-                
-                this.showNotification('Навигатор загружен. Чувствительность установлена на максимум!', 'success', 4000);
+            // Настройка слайдера
+            sensitivitySlider.addEventListener('input', function() {
+                movementSensitivity = parseInt(this.value);
+                sensitivityValue.textContent = movementSensitivity;
+            });
+        }
+        
+        // Изменение размера canvas
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = mapCanvas.getBoundingClientRect();
+            
+            mapCanvas.width = rect.width * dpr;
+            mapCanvas.height = rect.height * dpr;
+            
+            ctx.scale(dpr, dpr);
+            mapCanvas.style.width = rect.width + 'px';
+            mapCanvas.style.height = rect.height + 'px';
+            
+            if (mapImage) {
+                centerMap();
+            } else {
+                currentPosition.x = rect.width / 2;
+                currentPosition.y = rect.height / 2;
             }
             
-            resizeCanvas() {
-                const container = document.getElementById('mapContainer');
-                this.canvas.width = container.clientWidth;
-                this.canvas.height = container.clientHeight;
-                this.trailCanvas.width = container.clientWidth;
-                this.trailCanvas.height = container.clientHeight;
-                
-                if (this.userImage) {
-                    this.centerImage();
-                } else {
-                    this.drawWelcomeScreen();
-                }
-                
-                this.drawTrail();
+            drawMap();
+        }
+        
+        // Настройка сетки
+        function setupGrid() {
+            const gridSize = 50;
+            const width = mapCanvas.width / (window.devicePixelRatio || 1);
+            const height = mapCanvas.height / (window.devicePixelRatio || 1);
+            
+            grid.innerHTML = '';
+            
+            for (let x = 0; x < width; x += gridSize) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('class', 'grid-line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', 0);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', height);
+                grid.appendChild(line);
             }
             
-            drawWelcomeScreen() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                // Градиентный фон
-                const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
-                gradient.addColorStop(0, '#000000');
-                gradient.addColorStop(1, '#1a1a2e');
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                // Анимированные элементы
-                const centerX = this.canvas.width / 2;
-                const centerY = this.canvas.height / 2;
-                const time = Date.now() / 1000;
-                
-                // Анимация чувствительности
-                for (let i = 0; i < 5; i++) {
-                    const radius = 50 + i * 30;
-                    const opacity = 0.1 + Math.sin(time + i) * 0.1;
-                    
-                    this.ctx.beginPath();
-                    this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-                    this.ctx.strokeStyle = `rgba(255, 45, 85, ${opacity})`;
-                    this.ctx.lineWidth = 2;
-                    this.ctx.stroke();
-                }
-                
-                // Текст
-                this.ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont';
-                this.ctx.fillStyle = '#FFFFFF';
-                this.ctx.textAlign = 'center';
-                this.ctx.fillText('СУПЕР-ЧУВСТВИТЕЛЬНЫЙ', centerX, centerY - 40);
-                this.ctx.fillText('НАВИГАТОР', centerX, centerY);
-                
-                this.ctx.font = '16px -apple-system, BlinkMacSystemFont';
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                this.ctx.fillText('Стрелка реагирует на малейшее движение', centerX, centerY + 40);
-                this.ctx.fillText('Нажмите "Старт" для начала', centerX, centerY + 70);
-            }
-            
-            draw() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                if (this.userImage) {
-                    this.ctx.save();
-                    this.ctx.translate(this.imagePosition.x, this.imagePosition.y);
-                    this.ctx.scale(this.scale, this.scale);
-                    this.ctx.drawImage(this.userImage, 0, 0);
-                    this.ctx.restore();
-                    
-                    // Рисуем индикатор чувствительности
-                    this.drawSensitivityIndicator();
-                } else {
-                    this.drawWelcomeScreen();
-                }
-                
-                this.updateDisplay();
-            }
-            
-            drawSensitivityIndicator() {
-                const centerX = this.canvas.width / 2;
-                const centerY = this.canvas.height / 2;
-                const indicatorSize = 100 + (this.sensitivity * 10);
-                
-                // Внешний круг индикатора
-                this.ctx.beginPath();
-                this.ctx.arc(centerX, centerY, indicatorSize, 0, Math.PI * 2);
-                this.ctx.strokeStyle = `rgba(255, 45, 85, ${0.1 + this.sensitivity / 40})`;
-                this.ctx.lineWidth = 3;
-                this.ctx.stroke();
-                
-                // Линии чувствительности
-                for (let i = 0; i < 12; i++) {
-                    const angle = (i / 12) * Math.PI * 2;
-                    const lineLength = 20 + (this.sensitivity * 2);
-                    
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(
-                        centerX + Math.cos(angle) * indicatorSize,
-                        centerY + Math.sin(angle) * indicatorSize
-                    );
-                    this.ctx.lineTo(
-                        centerX + Math.cos(angle) * (indicatorSize + lineLength),
-                        centerY + Math.sin(angle) * (indicatorSize + lineLength)
-                    );
-                    this.ctx.strokeStyle = `rgba(255, 45, 85, ${0.3 + (i % 3) * 0.2})`;
-                    this.ctx.lineWidth = 2;
-                    this.ctx.stroke();
-                }
-            }
-            
-            drawTrail() {
-                if (this.trailPoints.length < 2) {
-                    this.trailCtx.clearRect(0, 0, this.trailCanvas.width, this.trailCanvas.height);
-                    return;
-                }
-                
-                this.trailCtx.clearRect(0, 0, this.trailCanvas.width, this.trailCanvas.height);
-                
-                // Градиентный след
-                const gradient = this.trailCtx.createLinearGradient(0, 0, this.trailCanvas.width, this.trailCanvas.height);
-                gradient.addColorStop(0, 'rgba(255, 45, 85, 0.8)');
-                gradient.addColorStop(1, 'rgba(255, 59, 48, 0.5)');
-                
-                this.trailCtx.strokeStyle = gradient;
-                this.trailCtx.lineWidth = 4;
-                this.trailCtx.lineCap = 'round';
-                this.trailCtx.lineJoin = 'round';
-                
-                this.trailCtx.beginPath();
-                
-                for (let i = 0; i < this.trailPoints.length; i++) {
-                    const point = this.trailPoints[i];
-                    const screenX = point.x * this.scale + this.imagePosition.x;
-                    const screenY = point.y * this.scale + this.imagePosition.y;
-                    
-                    if (i === 0) {
-                        this.trailCtx.moveTo(screenX, screenY);
-                    } else {
-                        this.trailCtx.lineTo(screenX, screenY);
-                    }
-                }
-                
-                this.trailCtx.stroke();
-                
-                // Точки движения
-                this.trailCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                for (let i = 0; i < this.trailPoints.length; i += 5) {
-                    const point = this.trailPoints[i];
-                    const screenX = point.x * this.scale + this.imagePosition.x;
-                    const screenY = point.y * this.scale + this.imagePosition.y;
-                    
-                    this.trailCtx.beginPath();
-                    this.trailCtx.arc(screenX, screenY, 2 + (i % 3), 0, Math.PI * 2);
-                    this.trailCtx.fill();
-                }
-            }
-            
-            centerArrow() {
-                this.arrowPosition.x = this.canvas.width / 2;
-                this.arrowPosition.y = this.canvas.height / 2;
-                this.updateArrowPosition();
-            }
-            
-            updateArrowPosition() {
-                this.locationArrow.style.left = `${this.arrowPosition.x}px`;
-                this.locationArrow.style.top = `${this.arrowPosition.y}px`;
-                
-                // Добавляем точку в путь
-                const mapX = (this.arrowPosition.x - this.imagePosition.x) / this.scale;
-                const mapY = (this.arrowPosition.y - this.imagePosition.y) / this.scale;
-                
-                this.trailPoints.push({ x: mapX, y: mapY });
-                
-                if (this.trailPoints.length > 500) {
-                    this.trailPoints.shift();
-                }
-                
-                this.drawTrail();
-            }
-            
-            // ===== ОСНОВНОЙ МЕТОД ДЕТЕКЦИИ ДВИЖЕНИЯ =====
-            
-            startMovementTracking() {
-                if (!this.trackingActive) {
-                    if (typeof DeviceMotionEvent !== 'undefined' && 
-                        typeof DeviceMotionEvent.requestPermission === 'function') {
-                        
-                        DeviceMotionEvent.requestPermission()
-                            .then(permissionState => {
-                                if (permissionState === 'granted') {
-                                    this.enableMovementTracking();
-                                } else {
-                                    this.showNotification('Доступ к датчикам запрещен', 'error');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Ошибка доступа:', error);
-                                this.showNotification('Ошибка доступа к датчикам', 'error');
-                            });
-                    } else {
-                        this.enableMovementTracking();
-                    }
-                } else {
-                    this.disableMovementTracking();
-                }
-            }
-            
-            enableMovementTracking() {
-                this.trackingActive = true;
-                this.startTime = Date.now();
-                this.movementCount = 0;
-                
-                // Используем высокочастотное отслеживание
-                window.addEventListener('devicemotion', this.handleDeviceMotion.bind(this), true);
-                
-                // Обновляем интерфейс
-                document.getElementById('startTrackingBtn').classList.remove('active');
-                document.getElementById('startTrackingBtn').classList.add('tracking');
-                document.getElementById('startTrackingBtn').innerHTML = '<i class="fas fa-stop"></i><span>Стоп</span>';
-                
-                document.getElementById('gpsStatus').className = 'indicator good';
-                document.getElementById('gpsStatus').innerHTML = 
-                    '<i class="fas fa-bolt"></i><span>ЧУВСТВИТЕЛЬНОСТЬ: ВКЛ</span>';
-                
-                this.showNotification('Отслеживание движения включено! Двигайтесь свободно.', 'success');
-                
-                // Запускаем дополнительное обновление для плавности
-                this.startSmoothUpdateLoop();
-            }
-            
-            disableMovementTracking() {
-                this.trackingActive = false;
-                this.boostActive = false;
-                
-                window.removeEventListener('devicemotion', this.handleDeviceMotion.bind(this));
-                
-                document.getElementById('startTrackingBtn').classList.remove('tracking');
-                document.getElementById('startTrackingBtn').classList.add('active');
-                document.getElementById('startTrackingBtn').innerHTML = '<i class="fas fa-play"></i><span>Старт</span>';
-                
-                document.getElementById('gpsStatus').innerHTML = 
-                    '<i class="fas fa-satellite"></i><span>GPS: Отслеживание выкл</span>';
-                
-                this.showNotification('Отслеживание движения выключено', 'info');
-            }
-            
-            handleDeviceMotion(event) {
-                if (!this.trackingActive) return;
-                
-                const acceleration = event.accelerationIncludingGravity || 
-                                    event.acceleration || 
-                                    { x: 0, y: 0, z: 9.81 };
-                
-                const rotation = event.rotationRate || { alpha: 0, beta: 0, gamma: 0 };
-                const now = Date.now();
-                
-                // УСИЛЕННАЯ обработка движения
-                const movement = this.calculateEnhancedMovement(acceleration, rotation);
-                
-                // Регистрируем движение даже при минимальных изменениях
-                if (movement.intensity > this.movementThreshold) {
-                    this.movementCount++;
-                    this.lastMovementTime = now;
-                    
-                    // Усиливаем движение в зависимости от настроек
-                    const enhancedMovement = this.enhanceMovement(movement);
-                    
-                    // Применяем движение к стрелке
-                    this.applyMovementToArrow(enhancedMovement);
-                    
-                    // Обновляем статистику
-                    this.updateMovementStats(movement);
-                    
-                    // Анимация стрелки
-                    this.animateArrowOnMovement();
-                }
-                
-                this.lastAcceleration = acceleration;
-            }
-            
-            calculateEnhancedMovement(acceleration, rotation) {
-                // Вычисляем изменение ускорения
-                const deltaX = Math.abs(acceleration.x - this.lastAcceleration.x);
-                const deltaY = Math.abs(acceleration.y - this.lastAcceleration.y);
-                const deltaZ = Math.abs(acceleration.z - this.lastAcceleration.z);
-                
-                // Учитываем вращение
-                const rotationFactor = (Math.abs(rotation.alpha) + Math.abs(rotation.beta) + Math.abs(rotation.gamma)) / 100;
-                
-                // Комбинируем факторы движения
-                const intensity = (deltaX + deltaY + deltaZ) * (1 + rotationFactor);
-                
-                // Определяем направление на основе изменений
-                const directionX = acceleration.x - this.lastAcceleration.x;
-                const directionY = acceleration.y - this.lastAcceleration.y;
-                
-                return {
-                    intensity: intensity * this.sensitivity,
-                    directionX: Math.sign(directionX),
-                    directionY: Math.sign(directionY),
-                    rawDeltaX: deltaX,
-                    rawDeltaY: deltaY,
-                    rawDeltaZ: deltaZ,
-                    rotation: rotationFactor
-                };
-            }
-            
-            enhanceMovement(movement) {
-                let multiplier = this.sensitivity;
-                
-                if (this.turboMode) multiplier *= 2;
-                if (this.boostActive) multiplier *= 3;
-                
-                // Сглаживание при включенном режиме
-                if (this.smoothMode && this.movementHistory.length > 0) {
-                    const lastMovement = this.movementHistory[this.movementHistory.length - 1];
-                    movement.intensity = (movement.intensity + lastMovement.intensity) / 2;
-                }
-                
-                // Сохраняем в историю
-                this.movementHistory.push({...movement, timestamp: Date.now()});
-                if (this.movementHistory.length > 20) {
-                    this.movementHistory.shift();
-                }
-                
-                return {
-                    intensity: movement.intensity * multiplier,
-                    directionX: movement.directionX,
-                    directionY: movement.directionY
-                };
-            }
-            
-            applyMovementToArrow(movement) {
-                // Вычисляем смещение с учетом чувствительности
-                const moveDistance = movement.intensity * 5; // Базовое расстояние
-                
-                // Применяем смещение в соответствующих направлениях
-                this.arrowPosition.x += movement.directionX * moveDistance;
-                this.arrowPosition.y += movement.directionY * moveDistance;
-                
-                // Обновляем общее движение
-                this.totalMovement += moveDistance;
-                
-                // Ограничиваем позицию в пределах видимой области
-                const padding = 100;
-                this.arrowPosition.x = Math.max(padding, Math.min(this.canvas.width - padding, this.arrowPosition.x));
-                this.arrowPosition.y = Math.max(padding, Math.min(this.canvas.height - padding, this.arrowPosition.y));
-                
-                // Обновляем позицию стрелки
-                this.updateArrowPosition();
-                
-                // Автопрокрутка карты
-                this.autoScrollMap();
-            }
-            
-            autoScrollMap() {
-                if (!this.userImage) return;
-                
-                const threshold = 150;
-                const scrollSpeed = 8 + (this.sensitivity / 2);
-                
-                let needsRedraw = false;
-                
-                if (this.arrowPosition.x < threshold) {
-                    this.imagePosition.x += scrollSpeed;
-                    needsRedraw = true;
-                } else if (this.arrowPosition.x > this.canvas.width - threshold) {
-                    this.imagePosition.x -= scrollSpeed;
-                    needsRedraw = true;
-                }
-                
-                if (this.arrowPosition.y < threshold) {
-                    this.imagePosition.y += scrollSpeed;
-                    needsRedraw = true;
-                } else if (this.arrowPosition.y > this.canvas.height - threshold) {
-                    this.imagePosition.y -= scrollSpeed;
-                    needsRedraw = true;
-                }
-                
-                if (needsRedraw) {
-                    this.draw();
-                }
-            }
-            
-            animateArrowOnMovement() {
-                // Пульсация при движении
-                this.locationArrow.classList.add('move-detected');
-                
-                setTimeout(() => {
-                    this.locationArrow.classList.remove('move-detected');
-                }, 1000);
-                
-                // Изменение цвета при высокой активности
-                const intensity = this.movementHistory.length > 0 ? 
-                    this.movementHistory[this.movementHistory.length - 1].intensity : 0;
-                
-                if (intensity > 5) {
-                    this.locationArrow.style.filter = 'drop-shadow(0 0 20px rgba(255, 204, 0, 0.8))';
-                    setTimeout(() => {
-                        this.locationArrow.style.filter = 'drop-shadow(0 0 15px rgba(255, 45, 85, 0.7))';
-                    }, 300);
-                }
-            }
-            
-            updateMovementStats(movement) {
-                // Обновляем отображение
-                document.getElementById('offsetX').textContent = `${Math.round(this.arrowPosition.x - this.canvas.width/2)} px`;
-                document.getElementById('offsetY').textContent = `${Math.round(this.arrowPosition.y - this.canvas.height/2)} px`;
-                
-                // Прогресс (процент от максимального возможного движения)
-                const maxProgress = 1000;
-                const progress = Math.min(100, Math.round((this.totalMovement / maxProgress) * 100));
-                document.getElementById('progress').textContent = `${progress}%`;
-                
-                // Активность в реальном времени
-                const activity = Math.min(100, Math.round(movement.intensity * 10));
-                document.getElementById('activity').textContent = `${activity}%`;
-                
-                // Обновляем индикатор движения
-                const activityLevel = Math.min(5, Math.floor(activity / 20));
-                const activityIcons = ['', '🐌', '🚶', '🏃', '🚀', '⚡'];
-                document.getElementById('movementStatus').innerHTML = 
-                    `<i class="fas fa-running"></i><span>Активность: ${activityIcons[activityLevel]} ${activity}%</span>`;
-            }
-            
-            startSmoothUpdateLoop() {
-                // Дополнительный цикл обновления для плавности
-                const smoothUpdate = () => {
-                    if (!this.trackingActive) return;
-                    
-                    // Плавное движение даже при отсутствии новых данных
-                    if (Date.now() - this.lastMovementTime < 1000) {
-                        // Продолжаем небольшое движение по инерции
-                        const inertia = 0.3;
-                        this.arrowPosition.x += (Math.random() - 0.5) * inertia * this.sensitivity;
-                        this.arrowPosition.y += (Math.random() - 0.5) * inertia * this.sensitivity;
-                        this.updateArrowPosition();
-                    }
-                    
-                    requestAnimationFrame(smoothUpdate);
-                };
-                
-                smoothUpdate();
-            }
-            
-            // ===== ОСНОВНЫЕ ФУНКЦИИ =====
-            
-            loadImage(file) {
-                if (!file.type.match('image.*')) {
-                    this.showNotification('Выберите файл изображения', 'error');
-                    return;
-                }
-                
-                this.showLoader();
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        this.userImage = img;
-                        this.centerImage();
-                        this.showNotification(`Карта загружена: ${file.name}`, 'success');
-                        this.hideLoader();
-                        
-                        // Очищаем путь
-                        this.trailPoints = [];
-                        this.drawTrail();
-                        this.centerArrow();
-                    };
-                    img.onerror = () => {
-                        this.showNotification('Ошибка загрузки изображения', 'error');
-                        this.hideLoader();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-            
-            centerImage() {
-                if (!this.userImage) return;
-                
-                this.imagePosition.x = (this.canvas.width - this.userImage.width * this.scale) / 2;
-                this.imagePosition.y = (this.canvas.height - this.userImage.height * this.scale) / 2;
-                this.draw();
-                this.drawTrail();
-            }
-            
-            zoomIn() {
-                if (this.scale < this.maxScale) {
-                    this.scale *= 1.2;
-                    this.adjustZoomPosition(1.2);
-                    this.draw();
-                    this.drawTrail();
-                }
-            }
-            
-            zoomOut() {
-                if (this.scale > this.minScale) {
-                    this.scale /= 1.2;
-                    this.adjustZoomPosition(1/1.2);
-                    this.draw();
-                    this.drawTrail();
-                }
-            }
-            
-            adjustZoomPosition(factor) {
-                const centerX = this.canvas.width / 2;
-                const centerY = this.canvas.height / 2;
-                
-                this.imagePosition.x = centerX - (centerX - this.imagePosition.x) * factor;
-                this.imagePosition.y = centerY - (centerY - this.imagePosition.y) * factor;
-            }
-            
-            resetView() {
-                this.scale = 1;
-                this.centerImage();
-                this.centerArrow();
-                this.totalMovement = 0;
-                this.trailPoints = [];
-                this.drawTrail();
-                this.showNotification('Позиция сброшена', 'info');
-            }
-            
-            toggleTurboMode() {
-                this.turboMode = !this.turboMode;
-                const turboBtn = document.getElementById('turboModeBtn');
-                turboBtn.classList.toggle('active', this.turboMode);
-                
-                this.showNotification(`Турбо-режим ${this.turboMode ? 'включен' : 'выключен'}`, 'info');
-            }
-            
-            toggleSmoothMode() {
-                this.smoothMode = !this.smoothMode;
-                const smoothBtn = document.getElementById('smoothModeBtn');
-                smoothBtn.classList.toggle('active', this.smoothMode);
-                
-                this.showNotification(`Сглаживание ${this.smoothMode ? 'включено' : 'выключено'}`, 'info');
-            }
-            
-            activateBoost() {
-                this.boostActive = !this.boostActive;
-                const boostBtn = document.getElementById('boostBtn');
-                
-                if (this.boostActive) {
-                    boostBtn.classList.add('active');
-                    boostBtn.innerHTML = '<i class="fas fa-bolt"></i><span>УСИЛЕНО</span>';
-                    this.showNotification('УСИЛЕНИЕ АКТИВИРОВАНО!', 'success');
-                    
-                    // Временное увеличение чувствительности
-                    setTimeout(() => {
-                        this.boostActive = false;
-                        boostBtn.classList.remove('active');
-                        boostBtn.innerHTML = '<i class="fas fa-bolt"></i><span>Усилить</span>';
-                        this.showNotification('Усиление завершено', 'info');
-                    }, 10000);
-                } else {
-                    boostBtn.classList.remove('active');
-                    boostBtn.innerHTML = '<i class="fas fa-bolt"></i><span>Усилить</span>';
-                }
-            }
-            
-            showStats() {
-                const timeActive = this.startTime ? 
-                    Math.round((Date.now() - this.startTime) / 1000) : 0;
-                
-                const statsMessage = `
-                    Активное время: ${timeActive} сек
-                    Обнаружено движений: ${this.movementCount}
-                    Общее смещение: ${Math.round(this.totalMovement)} px
-                    Текущая чувствительность: ${this.sensitivity}x
-                    ${this.turboMode ? '⚡ Турбо-режим: ВКЛ' : ''}
-                    ${this.smoothMode ? '🔄 Сглаживание: ВКЛ' : ''}
-                `.trim().split('\n').map(line => line.trim()).join('\n');
-                
-                this.showNotification(statsMessage, 'info', 5000);
-            }
-            
-            updateDisplay() {
-                // Обновляем отображение позиции
-                if (this.userImage) {
-                    const centerX = this.canvas.width / 2;
-                    const centerY = this.canvas.height / 2;
-                    
-                    const imgX = Math.round((centerX - this.imagePosition.x) / this.scale);
-                    const imgY = Math.round((centerY - this.imagePosition.y) / this.scale);
-                }
-            }
-            
-            showNotification(message, type = 'info', duration = 3000) {
-                const notification = document.getElementById('notification');
-                const text = document.getElementById('notificationText');
-                
-                notification.className = `notification ${type}`;
-                text.textContent = message;
-                
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, duration);
-            }
-            
-            showLoader() {
-                document.getElementById('loader').classList.add('show');
-            }
-            
-            hideLoader() {
-                document.getElementById('loader').classList.remove('show');
-            }
-            
-            setupEventListeners() {
-                // Загрузка карты
-                document.getElementById('navUploadBtn').addEventListener('click', () => {
-                    document.getElementById('mapUpload').click();
-                });
-                
-                document.getElementById('mapUpload').addEventListener('change', (e) => {
-                    if (e.target.files[0]) {
-                        this.loadImage(e.target.files[0]);
-                    }
-                });
-                
-                // Управление отслеживанием
-                document.getElementById('startTrackingBtn').addEventListener('click', () => {
-                    this.startMovementTracking();
-                });
-                
-                document.getElementById('boostBtn').addEventListener('click', () => {
-                    this.activateBoost();
-                });
-                
-                document.getElementById('resetBtn').addEventListener('click', () => {
-                    this.resetView();
-                });
-                
-                document.getElementById('statsBtn').addEventListener('click', () => {
-                    this.showStats();
-                });
-                
-                // Настройки чувствительности
-                const sensitivitySlider = document.getElementById('sensitivitySlider');
-                const sensitivityValue = document.getElementById('sensitivityValue');
-                
-                sensitivitySlider.addEventListener('input', (e) => {
-                    this.sensitivity = parseInt(e.target.value);
-                    sensitivityValue.textContent = `${this.sensitivity}x`;
-                    
-                    // Визуальная обратная связь
-                    this.showNotification(`Чувствительность: ${this.sensitivity}x`, 'info', 1000);
-                });
-                
-                // Режимы
-                document.getElementById('turboModeBtn').addEventListener('click', () => {
-                    this.toggleTurboMode();
-                });
-                
-                document.getElementById('smoothModeBtn').addEventListener('click', () => {
-                    this.toggleSmoothMode();
-                });
-                
-                // Масштабирование
-                document.getElementById('zoomIn').addEventListener('click', () => this.zoomIn());
-                document.getElementById('zoomOut').addEventListener('click', () => this.zoomOut());
-                document.getElementById('resetView').addEventListener('click', () => this.resetView());
-                
-                // Перетаскивание карты
-                let isDragging = false;
-                let dragStart = { x: 0, y: 0 };
-                
-                this.canvas.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (this.userImage && e.touches.length === 1) {
-                        isDragging = true;
-                        dragStart.x = e.touches[0].clientX - this.imagePosition.x;
-                        dragStart.y = e.touches[0].clientY - this.imagePosition.y;
-                    }
-                }, { passive: false });
-                
-                this.canvas.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    if (isDragging && this.userImage && e.touches.length === 1) {
-                        this.imagePosition.x = e.touches[0].clientX - dragStart.x;
-                        this.imagePosition.y = e.touches[0].clientY - dragStart.y;
-                        this.draw();
-                        this.drawTrail();
-                    }
-                }, { passive: false });
-                
-                this.canvas.addEventListener('touchend', () => {
-                    isDragging = false;
-                });
-                
-                // Масштабирование жестом
-                let initialDistance = 0;
-                
-                this.canvas.addEventListener('touchstart', (e) => {
-                    if (e.touches.length === 2 && this.userImage) {
-                        initialDistance = Math.hypot(
-                            e.touches[0].clientX - e.touches[1].clientX,
-                            e.touches[0].clientY - e.touches[1].clientY
-                        );
-                    }
-                });
-                
-                this.canvas.addEventListener('touchmove', (e) => {
-                    if (e.touches.length === 2 && this.userImage && initialDistance > 0) {
-                        e.preventDefault();
-                        
-                        const currentDistance = Math.hypot(
-                            e.touches[0].clientX - e.touches[1].clientX,
-                            e.touches[0].clientY - e.touches[1].clientY
-                        );
-                        
-                        const delta = currentDistance - initialDistance;
-                        if (Math.abs(delta) > 30) {
-                            if (delta > 0) {
-                                this.zoomIn();
-                            } else {
-                                this.zoomOut();
-                            }
-                            initialDistance = currentDistance;
-                        }
-                    }
-                }, { passive: false });
-                
-                // Предотвращение стандартных жестов
-                document.addEventListener('touchmove', (e) => {
-                    if (e.target === this.canvas || e.target.closest('.map-container')) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
+            for (let y = 0; y < height; y += gridSize) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('class', 'grid-line');
+                line.setAttribute('x1', 0);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', width);
+                line.setAttribute('y2', height);
+                grid.appendChild(line);
             }
         }
         
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                window.navigator = new SensitiveNavigator();
-            }, 100);
-        });
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Загрузка карты
+            mapUpload.addEventListener('change', handleMapUpload);
+            
+            // Сенсоры устройства
+            if (typeof DeviceOrientationEvent !== 'undefined') {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // iOS 13+
+                    document.addEventListener('click', requestMotionPermission, { once: true });
+                } else {
+                    // Android и другие
+                    window.addEventListener('deviceorientation', handleOrientation);
+                    window.addEventListener('devicemotion', handleMotion);
+                }
+            }
+            
+            // Перемещение карты
+            mapCanvas.addEventListener('mousedown', startDrag);
+            mapCanvas.addEventListener('touchstart', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            // Изменение размера окна
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Предотвращение масштабирования
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (e.scale !== 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
         
-        // Предотвращение масштабирования жестом на iOS
-        document.addEventListener('gesturestart', (e) => {
+        // Запрос разрешения на использование датчиков (iOS)
+        function requestMotionPermission() {
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                        window.addEventListener('devicemotion', handleMotion);
+                        updateStatus('Датчики активированы');
+                    } else {
+                        updateStatus('Датчики отключены - используйте ручное управление');
+                    }
+                })
+                .catch(console.error);
+        }
+        
+        // Обработка загрузки карты
+        function handleMapUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mapImage = new Image();
+                mapImage.onload = function() {
+                    centerMap();
+                    drawMap();
+                    updateStatus('Карта загружена. Наклоняйте телефон для навигации.');
+                };
+                mapImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Центрирование карты
+        function centerMap() {
+            if (!mapImage) return;
+            
+            const canvasWidth = mapCanvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = mapCanvas.height / (window.devicePixelRatio || 1);
+            
+            mapScale = Math.min(
+                canvasWidth / mapImage.width,
+                canvasHeight / mapImage.height,
+                1
+            );
+            
+            mapOffset.x = (canvasWidth - mapImage.width * mapScale) / 2;
+            mapOffset.y = (canvasHeight - mapImage.height * mapScale) / 2;
+            
+            currentPosition.x = canvasWidth / 2;
+            currentPosition.y = canvasHeight / 2;
+        }
+        
+        // Отрисовка карты и стрелки
+        function drawMap() {
+            const canvasWidth = mapCanvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = mapCanvas.height / (window.devicePixelRatio || 1);
+            
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            if (mapImage) {
+                ctx.drawImage(
+                    mapImage,
+                    mapOffset.x, mapOffset.y,
+                    mapImage.width * mapScale,
+                    mapImage.height * mapScale
+                );
+            } else {
+                // Рисуем placeholder
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                
+                ctx.fillStyle = '#34495e';
+                ctx.font = '20px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Загрузите карту', canvasWidth / 2, canvasHeight / 2);
+            }
+            
+            // Обновление позиции стрелки
+            updateArrowPosition();
+        }
+        
+        // Обновление позиции стрелки
+        function updateArrowPosition() {
+            arrow.style.left = `${currentPosition.x}px`;
+            arrow.style.top = `${currentPosition.y}px`;
+            
+            // Поворот стрелки на основе гироскопа
+            const rotation = smoothedGamma;
+            arrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            
+            // Обновление данных в интерфейсе
+            posXElement.textContent = Math.round(currentPosition.x);
+            posYElement.textContent = Math.round(currentPosition.y);
+            headingElement.textContent = `${Math.round(rotation)}°`;
+        }
+        
+        // Обработка гироскопа
+        function handleOrientation(event) {
+            if (!event.absolute) return;
+            
+            alpha = event.alpha; // Компас
+            beta = event.beta;   // Наклон вперед/назад
+            gamma = event.gamma; // Наклон влево/вправо
+            
+            // Сглаживание значений
+            smoothedGamma = smoothedGamma * 0.7 + gamma * 0.3;
+            
+            // Ограничение угла
+            smoothedGamma = Math.max(-90, Math.min(90, smoothedGamma));
+            
+            // Обновление стрелки
+            updateArrowPosition();
+        }
+        
+        // Обработка акселерометра
+        function handleMotion(event) {
+            if (!event.accelerationIncludingGravity) return;
+            
+            const accel = event.accelerationIncludingGravity;
+            
+            // Сглаживание ускорения
+            const smoothX = lastAcceleration.x * 0.8 + accel.x * 0.2;
+            const smoothY = lastAcceleration.y * 0.8 + accel.y * 0.2;
+            
+            // Фильтрация шума
+            const threshold = 0.5;
+            let movement = 0;
+            
+            if (Math.abs(smoothX) > threshold || Math.abs(smoothY) > threshold) {
+                movement = Math.sqrt(smoothX * smoothX + smoothY * smoothY) - threshold;
+                
+                // Преобразование движения в направлении стрелки
+                const angleRad = (smoothedGamma * Math.PI) / 180;
+                const moveForward = -smoothY * Math.cos(angleRad) + smoothX * Math.sin(angleRad);
+                const moveSide = smoothX * Math.cos(angleRad) + smoothY * Math.sin(angleRad);
+                
+                // Обновление позиции с учетом чувствительности
+                const sensitivity = movementSensitivity / 10;
+                currentPosition.x += moveForward * sensitivity;
+                currentPosition.y += moveSide * sensitivity;
+                
+                // Ограничение движения в пределах карты
+                if (mapImage) {
+                    const minX = mapOffset.x + 20;
+                    const maxX = mapOffset.x + mapImage.width * mapScale - 20;
+                    const minY = mapOffset.y + 20;
+                    const maxY = mapOffset.y + mapImage.height * mapScale - 20;
+                    
+                    currentPosition.x = Math.max(minX, Math.min(maxX, currentPosition.x));
+                    currentPosition.y = Math.max(minY, Math.min(maxY, currentPosition.y));
+                } else {
+                    const canvasWidth = mapCanvas.width / (window.devicePixelRatio || 1);
+                    const canvasHeight = mapCanvas.height / (window.devicePixelRatio || 1);
+                    
+                    currentPosition.x = Math.max(20, Math.min(canvasWidth - 20, currentPosition.x));
+                    currentPosition.y = Math.max(20, Math.min(canvasHeight - 20, currentPosition.y));
+                }
+                
+                drawMap();
+            }
+            
+            // Обновление отображения движения
+            movementElement.textContent = movement.toFixed(2);
+            lastAcceleration = { x: smoothX, y: smoothY, z: accel.z };
+        }
+        
+        // Перетаскивание карты
+        function startDrag(e) {
+            isDragging = true;
+            const rect = mapCanvas.getBoundingClientRect();
+            
+            if (e.type === 'touchstart') {
+                dragStart.x = e.touches[0].clientX - rect.left;
+                dragStart.y = e.touches[0].clientY - rect.top;
+            } else {
+                dragStart.x = e.clientX - rect.left;
+                dragStart.y = e.clientY - rect.top;
+            }
+            
+            lastOffset = { ...mapOffset };
+            mapCanvas.style.cursor = 'grabbing';
+        }
+        
+        function drag(e) {
+            if (!isDragging || !mapImage) return;
+            
             e.preventDefault();
-        });
+            const rect = mapCanvas.getBoundingClientRect();
+            let clientX, clientY;
+            
+            if (e.type === 'touchmove') {
+                clientX = e.touches[0].clientX - rect.left;
+                clientY = e.touches[0].clientY - rect.top;
+            } else {
+                clientX = e.clientX - rect.left;
+                clientY = e.clientY - rect.top;
+            }
+            
+            const deltaX = clientX - dragStart.x;
+            const deltaY = clientY - dragStart.y;
+            
+            mapOffset.x = lastOffset.x + deltaX;
+            mapOffset.y = lastOffset.y + deltaY;
+            
+            drawMap();
+        }
+        
+        function endDrag() {
+            isDragging = false;
+            mapCanvas.style.cursor = 'grab';
+        }
+        
+        // Вспомогательные функции
+        function updateStatus(message) {
+            statusText.textContent = message;
+        }
+        
+        function hideInstructions() {
+            instructions.style.display = 'none';
+            localStorage.setItem('instructionsShown', 'true');
+        }
+        
+        function toggleCalibration() {
+            calibrationPanel.classList.toggle('hidden');
+        }
+        
+        function calibrateSensors() {
+            isCalibrating = true;
+            updateStatus('Калибровка... Держите телефон неподвижно');
+            
+            setTimeout(() => {
+                calibrationOffset.x = lastAcceleration.x;
+                calibrationOffset.y = lastAcceleration.y;
+                isCalibrating = false;
+                calibrationPanel.classList.add('hidden');
+                updateStatus('Калибровка завершена');
+            }, 3000);
+        }
+        
+        function resetPosition() {
+            centerMap();
+            drawMap();
+            updateStatus('Позиция сброшена');
+        }
+        
+        // Запуск приложения
+        window.addEventListener('load', init);
+        
+        // Для iOS Web App
+        window.addEventListener('orientationchange', resizeCanvas);
     </script>
 </body>
 </html>
