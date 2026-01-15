@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
-    <title>📍 Навигатор с GPS-трекингом</title>
+    <title>📍 Навигатор с чувствительной стрелкой</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* iOS-совместимые стили */
@@ -71,7 +71,7 @@
         .nav-icon {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, #007AFF, #5856D6);
+            background: linear-gradient(135deg, #FF2D55, #FF375F);
             border-radius: 9px;
             display: flex;
             align-items: center;
@@ -162,15 +162,15 @@
             display: block;
         }
 
-        /* Стрелка местоположения */
+        /* Стрелка местоположения - УВЕЛИЧЕНА для лучшей видимости */
         .location-arrow {
             position: absolute;
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             z-index: 100;
             pointer-events: none;
-            filter: drop-shadow(0 0 10px rgba(0, 122, 255, 0.5));
-            transition: all 1s ease-out;
+            filter: drop-shadow(0 0 15px rgba(255, 45, 85, 0.7));
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform: translate(-50%, -50%);
         }
 
@@ -185,7 +185,7 @@
             bottom: 120px;
             left: 16px;
             right: 16px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 16px;
@@ -197,8 +197,8 @@
         .coord-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 15px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
         .coord-label {
@@ -208,7 +208,7 @@
         .coord-value {
             font-family: 'Menlo', 'Monaco', monospace;
             font-weight: 600;
-            color: #007AFF;
+            color: #FF2D55;
         }
 
         /* Нижняя панель управления */
@@ -232,7 +232,7 @@
             background: rgba(255, 255, 255, 0.1);
             border: none;
             border-radius: 12px;
-            padding: 14px;
+            padding: 12px;
             color: white;
             display: flex;
             flex-direction: column;
@@ -250,20 +250,20 @@
         }
 
         .control-btn i {
-            font-size: 22px;
+            font-size: 20px;
         }
 
         .control-btn span {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
         }
 
         .control-btn.active {
-            background: linear-gradient(135deg, #34C759, #28A745);
+            background: linear-gradient(135deg, #FF2D55, #FF375F);
         }
 
         .control-btn.tracking {
-            background: linear-gradient(135deg, #FF3B30, #D70015);
+            background: linear-gradient(135deg, #32D74B, #30D158);
         }
 
         /* Индикаторы */
@@ -294,9 +294,9 @@
             font-size: 16px;
         }
 
-        .indicator.good i { color: #34C759; }
+        .indicator.good i { color: #32D74B; }
         .indicator.warning i { color: #FF9500; }
-        .indicator.error i { color: #FF3B30; }
+        .indicator.error i { color: #FF453A; }
 
         .indicator span {
             opacity: 0.9;
@@ -333,58 +333,80 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Настройки GPS */
-        .gps-settings {
+        /* Настройки чувствительности */
+        .sensitivity-settings {
             position: absolute;
             top: 100px;
             left: 16px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 12px;
             z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 180px;
+        }
+
+        .slider-container {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .setting-item {
+        .slider-label {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .setting-label {
+        .slider-label span:first-child {
             opacity: 0.8;
         }
 
-        .setting-input {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            color: white;
-            padding: 4px 8px;
-            width: 60px;
-            text-align: center;
-            font-size: 14px;
+        .slider-label span:last-child {
+            color: #FF2D55;
+            font-weight: 600;
         }
 
-        .setting-btn {
+        .sensitivity-slider {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .sensitivity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FF2D55;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
+        }
+
+        .toggle-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
-            padding: 4px 8px;
+            padding: 6px 12px;
             font-size: 12px;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .setting-btn.active {
-            background: rgba(0, 122, 255, 0.5);
+        .toggle-btn.active {
+            background: rgba(255, 45, 85, 0.5);
         }
 
         /* Уведомления */
@@ -393,7 +415,7 @@
             top: 100px;
             left: 50%;
             transform: translateX(-50%) translateY(-100px);
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -419,8 +441,8 @@
             font-size: 18px;
         }
 
-        .notification.success i { color: #34C759; }
-        .notification.error i { color: #FF3B30; }
+        .notification.success i { color: #32D74B; }
+        .notification.error i { color: #FF453A; }
         .notification.warning i { color: #FF9500; }
 
         /* Загрузчик */
@@ -449,7 +471,7 @@
             width: 60px;
             height: 60px;
             border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #007AFF;
+            border-top-color: #FF2D55;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -458,10 +480,18 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Анимации */
+        /* Анимации для стрелки */
         @keyframes pulse {
             0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes moveDetection {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            25% { transform: translate(-50%, -50%) scale(1.3); }
+            50% { transform: translate(-50%, -50%) scale(1); }
+            75% { transform: translate(-50%, -50%) scale(1.3); }
             100% { transform: translate(-50%, -50%) scale(1); }
         }
 
@@ -469,13 +499,8 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes signal {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        .signal {
-            animation: signal 2s infinite;
+        .move-detected {
+            animation: moveDetection 1s ease;
         }
 
         /* Адаптация */
@@ -490,18 +515,28 @@
             }
             
             .control-btn {
-                padding: 12px;
+                padding: 10px;
+            }
+            
+            .location-arrow {
+                width: 70px;
+                height: 70px;
             }
         }
 
         @media (max-width: 400px) {
             .control-btn span {
-                font-size: 11px;
+                font-size: 10px;
             }
             
             .coordinates-panel {
                 left: 8px;
                 right: 8px;
+            }
+            
+            .sensitivity-settings {
+                width: 160px;
+                left: 8px;
             }
         }
     </style>
@@ -512,11 +547,11 @@
         <div class="nav-header">
             <div class="nav-title">
                 <div class="nav-icon">
-                    <i class="fas fa-satellite"></i>
+                    <i class="fas fa-bolt"></i>
                 </div>
                 <div class="nav-text">
-                    <h1>GPS Навигатор</h1>
-                    <p>Слежение за перемещением в пространстве</p>
+                    <h1>Чувствительный навигатор</h1>
+                    <p>Стрелка реагирует на малейшие перемещения</p>
                 </div>
             </div>
             <button class="nav-upload-btn" id="navUploadBtn" title="Загрузить карту">
@@ -535,29 +570,39 @@
                     <canvas id="trailCanvas"></canvas>
                 </div>
                 
-                <!-- Стрелка местоположения -->
+                <!-- Стрелка местоположения (УВЕЛИЧЕНА) -->
                 <div class="location-arrow" id="locationArrow">
                     <svg class="arrow-icon" viewBox="0 0 100 100">
                         <defs>
                             <radialGradient id="arrowGrad" cx="50%" cy="50%">
-                                <stop offset="0%" stop-color="#34C759"/>
-                                <stop offset="100%" stop-color="#28A745"/>
+                                <stop offset="0%" stop-color="#FF2D55"/>
+                                <stop offset="50%" stop-color="#FF375F"/>
+                                <stop offset="100%" stop-color="#FF1B40"/>
                             </radialGradient>
-                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="blur"/>
                                 <feMerge>
+                                    <feMergeNode in="blur"/>
                                     <feMergeNode in="blur"/>
                                     <feMergeNode in="SourceGraphic"/>
                                 </feMerge>
                             </filter>
                         </defs>
-                        <path d="M50 15 L60 50 L50 85 L40 50 Z" 
+                        <!-- Основная стрелка -->
+                        <path d="M50 10 L65 50 L50 90 L35 50 Z" 
                               fill="url(#arrowGrad)" 
                               stroke="#FFFFFF" 
-                              stroke-width="2"
+                              stroke-width="3"
                               filter="url(#glow)"/>
-                        <circle cx="50" cy="50" r="12" fill="#FFFFFF" opacity="0.3"/>
-                        <circle cx="50" cy="50" r="6" fill="#FFFFFF"/>
+                        <!-- Внутренняя подсветка -->
+                        <path d="M50 20 L58 50 L50 80 L42 50 Z" 
+                              fill="#FFFFFF" 
+                              opacity="0.3"/>
+                        <!-- Центральный круг -->
+                        <circle cx="50" cy="50" r="15" fill="#FFFFFF" opacity="0.2"/>
+                        <circle cx="50" cy="50" r="8" fill="#FFFFFF" opacity="0.8"/>
+                        <!-- Внешнее свечение -->
+                        <circle cx="50" cy="50" r="25" fill="none" stroke="#FF2D55" stroke-width="2" opacity="0.3"/>
                     </svg>
                 </div>
             </div>
@@ -568,28 +613,27 @@
                     <i class="fas fa-satellite"></i>
                     <span>GPS: Поиск сигнала...</span>
                 </div>
-                <div class="indicator" id="accuracyStatus">
-                    <i class="fas fa-bullseye"></i>
-                    <span>Точность: -- м</span>
+                <div class="indicator" id="movementStatus">
+                    <i class="fas fa-running"></i>
+                    <span>Движение: не обнаружено</span>
                 </div>
             </div>
 
-            <!-- Настройки GPS -->
-            <div class="gps-settings" id="gpsSettings">
-                <div class="setting-item">
-                    <span class="setting-label">Масштаб GPS:</span>
-                    <input type="number" id="gpsScale" class="setting-input" value="1000" min="1" max="100000" step="100">
+            <!-- Настройки чувствительности -->
+            <div class="sensitivity-settings" id="sensitivitySettings">
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Чувствительность:</span>
+                        <span id="sensitivityValue">10x</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="10" class="sensitivity-slider" id="sensitivitySlider">
                 </div>
-                <div class="setting-item">
-                    <span class="setting-label">След:</span>
-                    <button class="setting-btn" id="toggleTrail">
-                        вкл
+                <div style="display: flex; gap: 8px;">
+                    <button class="toggle-btn" id="turboModeBtn">
+                        <i class="fas fa-rocket"></i> Турбо
                     </button>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Автоцентр:</span>
-                    <button class="setting-btn" id="toggleAutoCenter">
-                        вкл
+                    <button class="toggle-btn" id="smoothModeBtn">
+                        <i class="fas fa-wave-square"></i> Сглаживание
                     </button>
                 </div>
             </div>
@@ -610,41 +654,41 @@
             <!-- Панель координат -->
             <div class="coordinates-panel">
                 <div class="coord-row">
-                    <span class="coord-label">Широта:</span>
-                    <span class="coord-value" id="latitude">—</span>
+                    <span class="coord-label">Смещение X:</span>
+                    <span class="coord-value" id="offsetX">0 px</span>
                 </div>
                 <div class="coord-row">
-                    <span class="coord-label">Долгота:</span>
-                    <span class="coord-value" id="longitude">—</span>
+                    <span class="coord-label">Смещение Y:</span>
+                    <span class="coord-value" id="offsetY">0 px</span>
                 </div>
                 <div class="coord-row">
-                    <span class="coord-label">Скорость:</span>
-                    <span class="coord-value" id="speed">— км/ч</span>
+                    <span class="coord-label">Прогресс:</span>
+                    <span class="coord-value" id="progress">0%</span>
                 </div>
                 <div class="coord-row">
-                    <span class="coord-label">Высота:</span>
-                    <span class="coord-value" id="altitude">— м</span>
+                    <span class="coord-label">Активность:</span>
+                    <span class="coord-value" id="activity">0%</span>
                 </div>
             </div>
         </div>
 
         <!-- Нижняя панель управления -->
         <div class="control-panel">
-            <button class="control-btn active" id="startGPSBtn">
-                <i class="fas fa-satellite"></i>
-                <span>Включить GPS</span>
+            <button class="control-btn active" id="startTrackingBtn">
+                <i class="fas fa-play"></i>
+                <span>Старт</span>
             </button>
-            <button class="control-btn" id="calibrateBtn">
-                <i class="fas fa-compass"></i>
-                <span>Калибровка</span>
+            <button class="control-btn" id="boostBtn">
+                <i class="fas fa-bolt"></i>
+                <span>Усилить</span>
             </button>
-            <button class="control-btn" id="clearTrailBtn">
-                <i class="fas fa-trash"></i>
-                <span>Очистить</span>
+            <button class="control-btn" id="resetBtn">
+                <i class="fas fa-redo"></i>
+                <span>Сброс</span>
             </button>
-            <button class="control-btn" id="saveBtn">
-                <i class="fas fa-save"></i>
-                <span>Сохранить</span>
+            <button class="control-btn" id="statsBtn">
+                <i class="fas fa-chart-line"></i>
+                <span>Статистика</span>
             </button>
         </div>
 
@@ -661,8 +705,8 @@
     </div>
 
     <script>
-        // Код приложения с GPS-трекингом реального перемещения
-        class GPSNavigator {
+        // Код приложения с повышенной чувствительностью стрелки
+        class SensitiveNavigator {
             constructor() {
                 this.canvas = document.getElementById('mapCanvas');
                 this.ctx = this.canvas.getContext('2d');
@@ -676,27 +720,29 @@
                 this.minScale = 0.1;
                 this.maxScale = 3;
                 
-                // Позиция стрелки на карте
+                // Позиция стрелки
                 this.arrowPosition = { x: 0, y: 0 };
                 this.trailPoints = [];
-                this.trailEnabled = true;
-                this.autoCenter = true;
                 
-                // GPS данные
-                this.gpsActive = false;
+                // Настройки чувствительности
+                this.sensitivity = 10; // Увеличенная чувствительность (1-20)
+                this.turboMode = false;
+                this.smoothMode = true;
+                this.trackingActive = false;
+                this.boostActive = false;
                 this.watchId = null;
-                this.currentPosition = null;
-                this.lastPosition = null;
-                this.totalDistance = 0;
-                this.gpsScale = 1000; // масштаб GPS координат к пикселям на карте
                 
-                // История позиций для сглаживания
-                this.positionHistory = [];
-                this.historySize = 5;
+                // Данные движения
+                this.movementHistory = [];
+                this.lastAcceleration = { x: 0, y: 0, z: 0 };
+                this.lastPosition = null;
+                this.totalMovement = 0;
+                this.movementThreshold = 0.05; // Низкий порог для обнаружения движения
                 
                 // Статистика
                 this.startTime = null;
-                this.movingTime = 0;
+                this.movementCount = 0;
+                this.lastMovementTime = 0;
                 
                 this.init();
             }
@@ -710,13 +756,12 @@
                 
                 this.setupEventListeners();
                 this.centerArrow();
-                this.showNotification('Навигатор загружен. Включите GPS для отслеживания перемещения.', 'info', 5000);
                 
-                // Загрузка сохраненных настроек
-                this.loadSettings();
+                // Устанавливаем высокую чувствительность по умолчанию
+                document.getElementById('sensitivitySlider').value = this.sensitivity;
+                document.getElementById('sensitivityValue').textContent = `${this.sensitivity}x`;
                 
-                // Проверяем доступность GPS
-                this.checkGPSAvailability();
+                this.showNotification('Навигатор загружен. Чувствительность установлена на максимум!', 'success', 4000);
             }
             
             resizeCanvas() {
@@ -738,47 +783,41 @@
             drawWelcomeScreen() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                // Фон
+                // Градиентный фон
                 const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
                 gradient.addColorStop(0, '#000000');
                 gradient.addColorStop(1, '#1a1a2e');
                 this.ctx.fillStyle = gradient;
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                // Иконка и текст
+                // Анимированные элементы
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
-                
-                // Анимированные спутники
-                this.ctx.font = 'bold 40px FontAwesome';
-                this.ctx.fillStyle = 'rgba(52, 199, 89, 0.3)';
-                this.ctx.textAlign = 'center';
-                
-                // Анимация сигнала
                 const time = Date.now() / 1000;
-                const pulse1 = 0.5 + 0.5 * Math.sin(time);
-                const pulse2 = 0.5 + 0.5 * Math.sin(time + 1);
-                const pulse3 = 0.5 + 0.5 * Math.sin(time + 2);
                 
-                this.ctx.fillStyle = `rgba(52, 199, 89, ${pulse1})`;
-                this.ctx.fillText('🛰️', centerX - 100, centerY - 50);
+                // Анимация чувствительности
+                for (let i = 0; i < 5; i++) {
+                    const radius = 50 + i * 30;
+                    const opacity = 0.1 + Math.sin(time + i) * 0.1;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    this.ctx.strokeStyle = `rgba(255, 45, 85, ${opacity})`;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+                }
                 
-                this.ctx.fillStyle = `rgba(52, 199, 89, ${pulse2})`;
-                this.ctx.fillText('🛰️', centerX, centerY - 100);
-                
-                this.ctx.fillStyle = `rgba(52, 199, 89, ${pulse3})`;
-                this.ctx.fillText('🛰️', centerX + 100, centerY - 50);
-                
-                // Заголовок
+                // Текст
                 this.ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont';
                 this.ctx.fillStyle = '#FFFFFF';
-                this.ctx.fillText('GPS Навигатор', centerX, centerY);
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('СУПЕР-ЧУВСТВИТЕЛЬНЫЙ', centerX, centerY - 40);
+                this.ctx.fillText('НАВИГАТОР', centerX, centerY);
                 
-                // Инструкция
                 this.ctx.font = '16px -apple-system, BlinkMacSystemFont';
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                this.ctx.fillText('Стрелка показывает ваше реальное местоположение', centerX, centerY + 40);
-                this.ctx.fillText('Нажмите "Включить GPS" для начала отслеживания', centerX, centerY + 70);
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                this.ctx.fillText('Стрелка реагирует на малейшее движение', centerX, centerY + 40);
+                this.ctx.fillText('Нажмите "Старт" для начала', centerX, centerY + 70);
             }
             
             draw() {
@@ -791,64 +830,62 @@
                     this.ctx.drawImage(this.userImage, 0, 0);
                     this.ctx.restore();
                     
-                    this.drawGrid();
+                    // Рисуем индикатор чувствительности
+                    this.drawSensitivityIndicator();
                 } else {
                     this.drawWelcomeScreen();
                 }
                 
-                this.updatePositionDisplay();
+                this.updateDisplay();
             }
             
-            drawGrid() {
-                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-                this.ctx.lineWidth = 1;
-                
-                const gridSize = 50 * this.scale;
-                const offsetX = this.imagePosition.x % gridSize;
-                const offsetY = this.imagePosition.y % gridSize;
-                
-                // Вертикальные линии
-                for (let x = -offsetX; x < this.canvas.width; x += gridSize) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x, 0);
-                    this.ctx.lineTo(x, this.canvas.height);
-                    this.ctx.stroke();
-                }
-                
-                // Горизонтальные линии
-                for (let y = -offsetY; y < this.canvas.height; y += gridSize) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(0, y);
-                    this.ctx.lineTo(this.canvas.width, y);
-                    this.ctx.stroke();
-                }
-                
-                // Центральный крест
+            drawSensitivityIndicator() {
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
+                const indicatorSize = 100 + (this.sensitivity * 10);
                 
-                this.ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
-                this.ctx.lineWidth = 2;
-                
+                // Внешний круг индикатора
                 this.ctx.beginPath();
-                this.ctx.moveTo(centerX - 15, centerY);
-                this.ctx.lineTo(centerX + 15, centerY);
-                this.ctx.moveTo(centerX, centerY - 15);
-                this.ctx.lineTo(centerX, centerY + 15);
+                this.ctx.arc(centerX, centerY, indicatorSize, 0, Math.PI * 2);
+                this.ctx.strokeStyle = `rgba(255, 45, 85, ${0.1 + this.sensitivity / 40})`;
+                this.ctx.lineWidth = 3;
                 this.ctx.stroke();
+                
+                // Линии чувствительности
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
+                    const lineLength = 20 + (this.sensitivity * 2);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(
+                        centerX + Math.cos(angle) * indicatorSize,
+                        centerY + Math.sin(angle) * indicatorSize
+                    );
+                    this.ctx.lineTo(
+                        centerX + Math.cos(angle) * (indicatorSize + lineLength),
+                        centerY + Math.sin(angle) * (indicatorSize + lineLength)
+                    );
+                    this.ctx.strokeStyle = `rgba(255, 45, 85, ${0.3 + (i % 3) * 0.2})`;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+                }
             }
             
             drawTrail() {
-                if (!this.trailEnabled || this.trailPoints.length < 2) {
+                if (this.trailPoints.length < 2) {
                     this.trailCtx.clearRect(0, 0, this.trailCanvas.width, this.trailCanvas.height);
                     return;
                 }
                 
                 this.trailCtx.clearRect(0, 0, this.trailCanvas.width, this.trailCanvas.height);
                 
-                // Рисуем путь движения
-                this.trailCtx.strokeStyle = 'rgba(52, 199, 89, 0.5)';
-                this.trailCtx.lineWidth = 3;
+                // Градиентный след
+                const gradient = this.trailCtx.createLinearGradient(0, 0, this.trailCanvas.width, this.trailCanvas.height);
+                gradient.addColorStop(0, 'rgba(255, 45, 85, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 59, 48, 0.5)');
+                
+                this.trailCtx.strokeStyle = gradient;
+                this.trailCtx.lineWidth = 4;
                 this.trailCtx.lineCap = 'round';
                 this.trailCtx.lineJoin = 'round';
                 
@@ -868,15 +905,15 @@
                 
                 this.trailCtx.stroke();
                 
-                // Рисуем точки пути
-                this.trailCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                for (let i = 0; i < this.trailPoints.length; i += 10) {
+                // Точки движения
+                this.trailCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                for (let i = 0; i < this.trailPoints.length; i += 5) {
                     const point = this.trailPoints[i];
                     const screenX = point.x * this.scale + this.imagePosition.x;
                     const screenY = point.y * this.scale + this.imagePosition.y;
                     
                     this.trailCtx.beginPath();
-                    this.trailCtx.arc(screenX, screenY, 3, 0, Math.PI * 2);
+                    this.trailCtx.arc(screenX, screenY, 2 + (i % 3), 0, Math.PI * 2);
                     this.trailCtx.fill();
                 }
             }
@@ -892,209 +929,201 @@
                 this.locationArrow.style.top = `${this.arrowPosition.y}px`;
                 
                 // Добавляем точку в путь
-                if (this.trailEnabled) {
-                    const mapX = (this.arrowPosition.x - this.imagePosition.x) / this.scale;
-                    const mapY = (this.arrowPosition.y - this.imagePosition.y) / this.scale;
-                    
-                    this.trailPoints.push({ x: mapX, y: mapY });
-                    
-                    if (this.trailPoints.length > 1000) {
-                        this.trailPoints.shift();
+                const mapX = (this.arrowPosition.x - this.imagePosition.x) / this.scale;
+                const mapY = (this.arrowPosition.y - this.imagePosition.y) / this.scale;
+                
+                this.trailPoints.push({ x: mapX, y: mapY });
+                
+                if (this.trailPoints.length > 500) {
+                    this.trailPoints.shift();
+                }
+                
+                this.drawTrail();
+            }
+            
+            // ===== ОСНОВНОЙ МЕТОД ДЕТЕКЦИИ ДВИЖЕНИЯ =====
+            
+            startMovementTracking() {
+                if (!this.trackingActive) {
+                    if (typeof DeviceMotionEvent !== 'undefined' && 
+                        typeof DeviceMotionEvent.requestPermission === 'function') {
+                        
+                        DeviceMotionEvent.requestPermission()
+                            .then(permissionState => {
+                                if (permissionState === 'granted') {
+                                    this.enableMovementTracking();
+                                } else {
+                                    this.showNotification('Доступ к датчикам запрещен', 'error');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Ошибка доступа:', error);
+                                this.showNotification('Ошибка доступа к датчикам', 'error');
+                            });
+                    } else {
+                        this.enableMovementTracking();
                     }
-                    
-                    this.drawTrail();
-                }
-            }
-            
-            // ===== GPS ФУНКЦИОНАЛ =====
-            
-            checkGPSAvailability() {
-                if (!navigator.geolocation) {
-                    this.showNotification('Ваш браузер не поддерживает геолокацию', 'error');
-                    document.getElementById('startGPSBtn').disabled = true;
-                    document.getElementById('startGPSBtn').innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Не поддерживается</span>';
-                    return false;
-                }
-                
-                document.getElementById('gpsStatus').innerHTML = 
-                    '<i class="fas fa-satellite signal"></i><span>GPS: Готов к работе</span>';
-                return true;
-            }
-            
-            startGPSTracking() {
-                if (!this.checkGPSAvailability()) return;
-                
-                if (!this.gpsActive) {
-                    // Запрашиваем высокую точность GPS
-                    const options = {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    };
-                    
-                    // Одноразовое получение для проверки
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            this.onGPSSuccess(position);
-                            this.startWatchingGPS();
-                        },
-                        (error) => this.onGPSError(error),
-                        options
-                    );
                 } else {
-                    this.stopGPSTracking();
+                    this.disableMovementTracking();
                 }
             }
             
-            startWatchingGPS() {
-                if (this.watchId) {
-                    navigator.geolocation.clearWatch(this.watchId);
-                }
-                
-                const options = {
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 1000
-                };
-                
-                this.watchId = navigator.geolocation.watchPosition(
-                    (position) => this.onGPSSuccess(position, true),
-                    (error) => this.onGPSError(error),
-                    options
-                );
-                
-                this.gpsActive = true;
+            enableMovementTracking() {
+                this.trackingActive = true;
                 this.startTime = Date.now();
-                document.getElementById('startGPSBtn').classList.remove('active');
-                document.getElementById('startGPSBtn').classList.add('tracking');
-                document.getElementById('startGPSBtn').innerHTML = '<i class="fas fa-stop"></i><span>Выключить GPS</span>';
+                this.movementCount = 0;
                 
-                this.showNotification('GPS отслеживание включено. Перемещайтесь для обновления позиции.', 'success');
-            }
-            
-            stopGPSTracking() {
-                if (this.watchId) {
-                    navigator.geolocation.clearWatch(this.watchId);
-                    this.watchId = null;
-                }
-                
-                this.gpsActive = false;
-                document.getElementById('startGPSBtn').classList.remove('tracking');
-                document.getElementById('startGPSBtn').classList.add('active');
-                document.getElementById('startGPSBtn').innerHTML = '<i class="fas fa-satellite"></i><span>Включить GPS</span>';
-                
-                this.showNotification('GPS отслеживание выключено', 'info');
-            }
-            
-            onGPSSuccess(position, isUpdate = false) {
-                this.currentPosition = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: position.coords.accuracy,
-                    altitude: position.coords.altitude,
-                    speed: position.coords.speed,
-                    heading: position.coords.heading,
-                    timestamp: new Date(position.timestamp)
-                };
+                // Используем высокочастотное отслеживание
+                window.addEventListener('devicemotion', this.handleDeviceMotion.bind(this), true);
                 
                 // Обновляем интерфейс
-                this.updateGPSDisplay();
+                document.getElementById('startTrackingBtn').classList.remove('active');
+                document.getElementById('startTrackingBtn').classList.add('tracking');
+                document.getElementById('startTrackingBtn').innerHTML = '<i class="fas fa-stop"></i><span>Стоп</span>';
                 
-                // Обновляем позицию стрелки на карте
-                this.updateArrowFromGPS();
+                document.getElementById('gpsStatus').className = 'indicator good';
+                document.getElementById('gpsStatus').innerHTML = 
+                    '<i class="fas fa-bolt"></i><span>ЧУВСТВИТЕЛЬНОСТЬ: ВКЛ</span>';
                 
-                // Обновляем статистику
-                this.updateStats();
+                this.showNotification('Отслеживание движения включено! Двигайтесь свободно.', 'success');
                 
-                if (!isUpdate) {
-                    this.showNotification('GPS сигнал получен. Начальная позиция установлена.', 'success');
-                }
-                
-                // Пульсация стрелки при обновлении
-                this.locationArrow.classList.add('pulse');
-                setTimeout(() => {
-                    this.locationArrow.classList.remove('pulse');
-                }, 1000);
+                // Запускаем дополнительное обновление для плавности
+                this.startSmoothUpdateLoop();
             }
             
-            onGPSError(error) {
-                let message = 'Ошибка GPS: ';
+            disableMovementTracking() {
+                this.trackingActive = false;
+                this.boostActive = false;
                 
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        message = 'Доступ к геолокации запрещен. Разрешите доступ в настройках iPhone.';
-                        this.showNotification(message, 'error', 5000);
-                        document.getElementById('gpsStatus').className = 'indicator error';
-                        document.getElementById('gpsStatus').innerHTML = 
-                            '<i class="fas fa-exclamation-triangle"></i><span>GPS: Доступ запрещен</span>';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        message = 'Информация о местоположении недоступна. Включите GPS.';
-                        this.showNotification(message, 'warning');
-                        document.getElementById('gpsStatus').className = 'indicator warning';
-                        document.getElementById('gpsStatus').innerHTML = 
-                            '<i class="fas fa-exclamation-triangle"></i><span>GPS: Сигнал потерян</span>';
-                        break;
-                    case error.TIMEOUT:
-                        message = 'Время ожидания GPS истекло. Проверьте подключение.';
-                        this.showNotification(message, 'warning');
-                        document.getElementById('gpsStatus').className = 'indicator warning';
-                        document.getElementById('gpsStatus').innerHTML = 
-                            '<i class="fas fa-clock"></i><span>GPS: Таймаут</span>';
-                        break;
-                    default:
-                        message = 'Неизвестная ошибка GPS.';
-                        this.showNotification(message, 'error');
-                }
+                window.removeEventListener('devicemotion', this.handleDeviceMotion.bind(this));
+                
+                document.getElementById('startTrackingBtn').classList.remove('tracking');
+                document.getElementById('startTrackingBtn').classList.add('active');
+                document.getElementById('startTrackingBtn').innerHTML = '<i class="fas fa-play"></i><span>Старт</span>';
+                
+                document.getElementById('gpsStatus').innerHTML = 
+                    '<i class="fas fa-satellite"></i><span>GPS: Отслеживание выкл</span>';
+                
+                this.showNotification('Отслеживание движения выключено', 'info');
             }
             
-            updateArrowFromGPS() {
-                if (!this.currentPosition || !this.lastPosition) {
-                    // Первая позиция - центрируем
-                    this.arrowPosition.x = this.canvas.width / 2;
-                    this.arrowPosition.y = this.canvas.height / 2;
-                    this.lastPosition = this.currentPosition;
-                } else {
-                    // Вычисляем смещение относительно предыдущей позиции
-                    const deltaLat = this.currentPosition.latitude - this.lastPosition.latitude;
-                    const deltaLon = this.currentPosition.longitude - this.lastPosition.longitude;
+            handleDeviceMotion(event) {
+                if (!this.trackingActive) return;
+                
+                const acceleration = event.accelerationIncludingGravity || 
+                                    event.acceleration || 
+                                    { x: 0, y: 0, z: 9.81 };
+                
+                const rotation = event.rotationRate || { alpha: 0, beta: 0, gamma: 0 };
+                const now = Date.now();
+                
+                // УСИЛЕННАЯ обработка движения
+                const movement = this.calculateEnhancedMovement(acceleration, rotation);
+                
+                // Регистрируем движение даже при минимальных изменениях
+                if (movement.intensity > this.movementThreshold) {
+                    this.movementCount++;
+                    this.lastMovementTime = now;
                     
-                    // Конвертируем в пиксели с учетом масштаба GPS
-                    const deltaX = deltaLon * this.gpsScale;
-                    const deltaY = -deltaLat * this.gpsScale; // Инвертируем Y (север = вверх)
+                    // Усиливаем движение в зависимости от настроек
+                    const enhancedMovement = this.enhanceMovement(movement);
                     
-                    // Обновляем позицию стрелки
-                    this.arrowPosition.x += deltaX;
-                    this.arrowPosition.y += deltaY;
+                    // Применяем движение к стрелке
+                    this.applyMovementToArrow(enhancedMovement);
                     
-                    // Поворачиваем стрелку по направлению движения
-                    if (this.currentPosition.heading !== null) {
-                        this.locationArrow.style.transform = `translate(-50%, -50%) rotate(${this.currentPosition.heading}deg)`;
-                    }
+                    // Обновляем статистику
+                    this.updateMovementStats(movement);
                     
-                    // Сохраняем текущую позицию как предыдущую
-                    this.lastPosition = this.currentPosition;
+                    // Анимация стрелки
+                    this.animateArrowOnMovement();
                 }
+                
+                this.lastAcceleration = acceleration;
+            }
+            
+            calculateEnhancedMovement(acceleration, rotation) {
+                // Вычисляем изменение ускорения
+                const deltaX = Math.abs(acceleration.x - this.lastAcceleration.x);
+                const deltaY = Math.abs(acceleration.y - this.lastAcceleration.y);
+                const deltaZ = Math.abs(acceleration.z - this.lastAcceleration.z);
+                
+                // Учитываем вращение
+                const rotationFactor = (Math.abs(rotation.alpha) + Math.abs(rotation.beta) + Math.abs(rotation.gamma)) / 100;
+                
+                // Комбинируем факторы движения
+                const intensity = (deltaX + deltaY + deltaZ) * (1 + rotationFactor);
+                
+                // Определяем направление на основе изменений
+                const directionX = acceleration.x - this.lastAcceleration.x;
+                const directionY = acceleration.y - this.lastAcceleration.y;
+                
+                return {
+                    intensity: intensity * this.sensitivity,
+                    directionX: Math.sign(directionX),
+                    directionY: Math.sign(directionY),
+                    rawDeltaX: deltaX,
+                    rawDeltaY: deltaY,
+                    rawDeltaZ: deltaZ,
+                    rotation: rotationFactor
+                };
+            }
+            
+            enhanceMovement(movement) {
+                let multiplier = this.sensitivity;
+                
+                if (this.turboMode) multiplier *= 2;
+                if (this.boostActive) multiplier *= 3;
+                
+                // Сглаживание при включенном режиме
+                if (this.smoothMode && this.movementHistory.length > 0) {
+                    const lastMovement = this.movementHistory[this.movementHistory.length - 1];
+                    movement.intensity = (movement.intensity + lastMovement.intensity) / 2;
+                }
+                
+                // Сохраняем в историю
+                this.movementHistory.push({...movement, timestamp: Date.now()});
+                if (this.movementHistory.length > 20) {
+                    this.movementHistory.shift();
+                }
+                
+                return {
+                    intensity: movement.intensity * multiplier,
+                    directionX: movement.directionX,
+                    directionY: movement.directionY
+                };
+            }
+            
+            applyMovementToArrow(movement) {
+                // Вычисляем смещение с учетом чувствительности
+                const moveDistance = movement.intensity * 5; // Базовое расстояние
+                
+                // Применяем смещение в соответствующих направлениях
+                this.arrowPosition.x += movement.directionX * moveDistance;
+                this.arrowPosition.y += movement.directionY * moveDistance;
+                
+                // Обновляем общее движение
+                this.totalMovement += moveDistance;
                 
                 // Ограничиваем позицию в пределах видимой области
-                const padding = 50;
+                const padding = 100;
                 this.arrowPosition.x = Math.max(padding, Math.min(this.canvas.width - padding, this.arrowPosition.x));
                 this.arrowPosition.y = Math.max(padding, Math.min(this.canvas.height - padding, this.arrowPosition.y));
                 
-                // Обновляем отображение
+                // Обновляем позицию стрелки
                 this.updateArrowPosition();
-                this.scrollMapIfNeeded();
+                
+                // Автопрокрутка карты
+                this.autoScrollMap();
             }
             
-            scrollMapIfNeeded() {
-                if (!this.userImage || !this.autoCenter) return;
+            autoScrollMap() {
+                if (!this.userImage) return;
                 
-                const threshold = 100;
-                const scrollSpeed = 5;
+                const threshold = 150;
+                const scrollSpeed = 8 + (this.sensitivity / 2);
                 
                 let needsRedraw = false;
                 
-                // Проверяем края
                 if (this.arrowPosition.x < threshold) {
                     this.imagePosition.x += scrollSpeed;
                     needsRedraw = true;
@@ -1113,126 +1142,68 @@
                 
                 if (needsRedraw) {
                     this.draw();
-                    this.drawTrail();
                 }
             }
             
-            updateGPSDisplay() {
-                if (!this.currentPosition) return;
+            animateArrowOnMovement() {
+                // Пульсация при движении
+                this.locationArrow.classList.add('move-detected');
                 
-                document.getElementById('latitude').textContent = this.currentPosition.latitude.toFixed(6);
-                document.getElementById('longitude').textContent = this.currentPosition.longitude.toFixed(6);
-                
-                const speed = this.currentPosition.speed ? (this.currentPosition.speed * 3.6).toFixed(1) : '—';
-                document.getElementById('speed').textContent = `${speed} км/ч`;
-                
-                const altitude = this.currentPosition.altitude ? Math.round(this.currentPosition.altitude) : '—';
-                document.getElementById('altitude').textContent = `${altitude} м`;
-                
-                // Обновляем индикаторы
-                document.getElementById('gpsStatus').className = 'indicator good';
-                document.getElementById('gpsStatus').innerHTML = 
-                    `<i class="fas fa-satellite"></i><span>GPS: ${Math.round(this.currentPosition.accuracy)} м</span>`;
-                
-                document.getElementById('accuracyStatus').innerHTML = 
-                    `<i class="fas fa-bullseye"></i><span>Точность: ${Math.round(this.currentPosition.accuracy)} м</span>`;
-            }
-            
-            updateStats() {
-                if (!this.currentPosition || !this.lastPosition) return;
-                
-                // Вычисляем пройденное расстояние
-                const distance = this.calculateDistance(
-                    this.lastPosition.latitude, this.lastPosition.longitude,
-                    this.currentPosition.latitude, this.currentPosition.longitude
-                );
-                
-                if (distance > 0) {
-                    this.totalDistance += distance;
-                    this.movingTime += Date.now() - (this.startTime || Date.now());
-                }
-            }
-            
-            calculateDistance(lat1, lon1, lat2, lon2) {
-                // Формула гаверсинусов для расчета расстояния между координатами
-                const R = 6371e3; // Радиус Земли в метрах
-                const φ1 = lat1 * Math.PI / 180;
-                const φ2 = lat2 * Math.PI / 180;
-                const Δφ = (lat2 - lat1) * Math.PI / 180;
-                const Δλ = (lon2 - lon1) * Math.PI / 180;
-                
-                const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                          Math.cos(φ1) * Math.cos(φ2) *
-                          Math.sin(Δλ/2) * Math.sin(Δλ/2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                
-                return R * c; // Расстояние в метрах
-            }
-            
-            calibrateGPS() {
-                this.showNotification('Калибровка: пройдите 10 метров по прямой и нажмите "Завершить"', 'info');
-                
-                // Сохраняем начальную точку
-                const startLat = this.currentPosition?.latitude;
-                const startLon = this.currentPosition?.longitude;
-                let calibrationPoints = [];
-                
-                // Слушаем GPS во время калибровки
-                const calibrateInterval = setInterval(() => {
-                    if (this.currentPosition) {
-                        calibrationPoints.push({
-                            lat: this.currentPosition.latitude,
-                            lon: this.currentPosition.longitude
-                        });
-                        
-                        // Если прошли достаточно точек, вычисляем масштаб
-                        if (calibrationPoints.length > 10) {
-                            const first = calibrationPoints[0];
-                            const last = calibrationPoints[calibrationPoints.length - 1];
-                            const realDistance = this.calculateDistance(first.lat, first.lon, last.lat, last.lon);
-                            const screenDistance = Math.sqrt(
-                                Math.pow(this.arrowPosition.x - (this.canvas.width / 2), 2) +
-                                Math.pow(this.arrowPosition.y - (this.canvas.height / 2), 2)
-                            );
-                            
-                            if (realDistance > 0 && screenDistance > 0) {
-                                this.gpsScale = screenDistance / realDistance;
-                                document.getElementById('gpsScale').value = Math.round(this.gpsScale);
-                                this.showNotification(`Масштаб установлен: ${Math.round(this.gpsScale)}`, 'success');
-                            }
-                        }
-                    }
+                setTimeout(() => {
+                    this.locationArrow.classList.remove('move-detected');
                 }, 1000);
                 
-                // Кнопка для завершения калибровки
-                const completeBtn = document.createElement('button');
-                completeBtn.textContent = 'Завершить калибровку';
-                completeBtn.style.cssText = `
-                    position: absolute;
-                    top: 200px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: #34C759;
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 10px;
-                    z-index: 1000;
-                `;
-                completeBtn.onclick = () => {
-                    clearInterval(calibrateInterval);
-                    completeBtn.remove();
-                    this.showNotification('Калибровка завершена', 'success');
+                // Изменение цвета при высокой активности
+                const intensity = this.movementHistory.length > 0 ? 
+                    this.movementHistory[this.movementHistory.length - 1].intensity : 0;
+                
+                if (intensity > 5) {
+                    this.locationArrow.style.filter = 'drop-shadow(0 0 20px rgba(255, 204, 0, 0.8))';
+                    setTimeout(() => {
+                        this.locationArrow.style.filter = 'drop-shadow(0 0 15px rgba(255, 45, 85, 0.7))';
+                    }, 300);
+                }
+            }
+            
+            updateMovementStats(movement) {
+                // Обновляем отображение
+                document.getElementById('offsetX').textContent = `${Math.round(this.arrowPosition.x - this.canvas.width/2)} px`;
+                document.getElementById('offsetY').textContent = `${Math.round(this.arrowPosition.y - this.canvas.height/2)} px`;
+                
+                // Прогресс (процент от максимального возможного движения)
+                const maxProgress = 1000;
+                const progress = Math.min(100, Math.round((this.totalMovement / maxProgress) * 100));
+                document.getElementById('progress').textContent = `${progress}%`;
+                
+                // Активность в реальном времени
+                const activity = Math.min(100, Math.round(movement.intensity * 10));
+                document.getElementById('activity').textContent = `${activity}%`;
+                
+                // Обновляем индикатор движения
+                const activityLevel = Math.min(5, Math.floor(activity / 20));
+                const activityIcons = ['', '🐌', '🚶', '🏃', '🚀', '⚡'];
+                document.getElementById('movementStatus').innerHTML = 
+                    `<i class="fas fa-running"></i><span>Активность: ${activityIcons[activityLevel]} ${activity}%</span>`;
+            }
+            
+            startSmoothUpdateLoop() {
+                // Дополнительный цикл обновления для плавности
+                const smoothUpdate = () => {
+                    if (!this.trackingActive) return;
+                    
+                    // Плавное движение даже при отсутствии новых данных
+                    if (Date.now() - this.lastMovementTime < 1000) {
+                        // Продолжаем небольшое движение по инерции
+                        const inertia = 0.3;
+                        this.arrowPosition.x += (Math.random() - 0.5) * inertia * this.sensitivity;
+                        this.arrowPosition.y += (Math.random() - 0.5) * inertia * this.sensitivity;
+                        this.updateArrowPosition();
+                    }
+                    
+                    requestAnimationFrame(smoothUpdate);
                 };
                 
-                document.querySelector('.main-content').appendChild(completeBtn);
-                
-                // Автозавершение через 30 секунд
-                setTimeout(() => {
-                    if (completeBtn.parentNode) {
-                        completeBtn.click();
-                    }
-                }, 30000);
+                smoothUpdate();
             }
             
             // ===== ОСНОВНЫЕ ФУНКЦИИ =====
@@ -1253,10 +1224,6 @@
                         this.centerImage();
                         this.showNotification(`Карта загружена: ${file.name}`, 'success');
                         this.hideLoader();
-                        
-                        // Сохраняем в localStorage
-                        localStorage.setItem('lastMap', e.target.result);
-                        localStorage.setItem('lastMapName', file.name);
                         
                         // Очищаем путь
                         this.trailPoints = [];
@@ -1310,98 +1277,69 @@
             resetView() {
                 this.scale = 1;
                 this.centerImage();
-                if (this.autoCenter) {
-                    this.centerArrow();
-                }
-                this.showNotification('Вид сброшен', 'info');
-            }
-            
-            clearTrail() {
+                this.centerArrow();
+                this.totalMovement = 0;
                 this.trailPoints = [];
-                this.totalDistance = 0;
                 this.drawTrail();
-                this.showNotification('Путь очищен', 'info');
+                this.showNotification('Позиция сброшена', 'info');
             }
             
-            toggleTrail() {
-                this.trailEnabled = !this.trailEnabled;
-                const trailBtn = document.getElementById('toggleTrail');
-                trailBtn.textContent = this.trailEnabled ? 'вкл' : 'выкл';
-                trailBtn.classList.toggle('active', this.trailEnabled);
+            toggleTurboMode() {
+                this.turboMode = !this.turboMode;
+                const turboBtn = document.getElementById('turboModeBtn');
+                turboBtn.classList.toggle('active', this.turboMode);
                 
-                this.drawTrail();
-                this.showNotification(`След ${this.trailEnabled ? 'включен' : 'выключен'}`, 'info');
+                this.showNotification(`Турбо-режим ${this.turboMode ? 'включен' : 'выключен'}`, 'info');
             }
             
-            toggleAutoCenter() {
-                this.autoCenter = !this.autoCenter;
-                const centerBtn = document.getElementById('toggleAutoCenter');
-                centerBtn.textContent = this.autoCenter ? 'вкл' : 'выкл';
-                centerBtn.classList.toggle('active', this.autoCenter);
+            toggleSmoothMode() {
+                this.smoothMode = !this.smoothMode;
+                const smoothBtn = document.getElementById('smoothModeBtn');
+                smoothBtn.classList.toggle('active', this.smoothMode);
                 
-                this.showNotification(`Автоцентрирование ${this.autoCenter ? 'включено' : 'выключено'}`, 'info');
+                this.showNotification(`Сглаживание ${this.smoothMode ? 'включено' : 'выключено'}`, 'info');
             }
             
-            saveSettings() {
-                const settings = {
-                    gpsScale: this.gpsScale,
-                    trailEnabled: this.trailEnabled,
-                    autoCenter: this.autoCenter,
-                    arrowPosition: this.arrowPosition,
-                    imagePosition: this.imagePosition,
-                    scale: this.scale,
-                    totalDistance: this.totalDistance,
-                    trailPoints: this.trailPoints
-                };
+            activateBoost() {
+                this.boostActive = !this.boostActive;
+                const boostBtn = document.getElementById('boostBtn');
                 
-                localStorage.setItem('gpsNavigatorSettings', JSON.stringify(settings));
-                this.showNotification('Настройки сохранены', 'success');
-            }
-            
-            loadSettings() {
-                const saved = localStorage.getItem('gpsNavigatorSettings');
-                if (saved) {
-                    try {
-                        const settings = JSON.parse(saved);
-                        this.gpsScale = settings.gpsScale || 1000;
-                        this.trailEnabled = settings.trailEnabled !== false;
-                        this.autoCenter = settings.autoCenter !== false;
-                        this.arrowPosition = settings.arrowPosition || { x: this.canvas.width / 2, y: this.canvas.height / 2 };
-                        this.imagePosition = settings.imagePosition || { x: 0, y: 0 };
-                        this.scale = settings.scale || 1;
-                        this.totalDistance = settings.totalDistance || 0;
-                        this.trailPoints = settings.trailPoints || [];
-                        
-                        document.getElementById('gpsScale').value = this.gpsScale;
-                        document.getElementById('toggleTrail').textContent = this.trailEnabled ? 'вкл' : 'выкл';
-                        document.getElementById('toggleTrail').classList.toggle('active', this.trailEnabled);
-                        document.getElementById('toggleAutoCenter').textContent = this.autoCenter ? 'вкл' : 'выкл';
-                        document.getElementById('toggleAutoCenter').classList.toggle('active', this.autoCenter);
-                        
-                        this.updateArrowPosition();
-                        this.draw();
-                        this.drawTrail();
-                    } catch (e) {
-                        console.error('Ошибка загрузки настроек:', e);
-                    }
-                }
-                
-                // Загрузка последней карты
-                const lastMap = localStorage.getItem('lastMap');
-                if (lastMap) {
-                    const img = new Image();
-                    img.onload = () => {
-                        this.userImage = img;
-                        this.draw();
-                        const mapName = localStorage.getItem('lastMapName') || 'Сохраненная карта';
-                        this.showNotification(`Загружена ${mapName}`, 'info');
-                    };
-                    img.src = lastMap;
+                if (this.boostActive) {
+                    boostBtn.classList.add('active');
+                    boostBtn.innerHTML = '<i class="fas fa-bolt"></i><span>УСИЛЕНО</span>';
+                    this.showNotification('УСИЛЕНИЕ АКТИВИРОВАНО!', 'success');
+                    
+                    // Временное увеличение чувствительности
+                    setTimeout(() => {
+                        this.boostActive = false;
+                        boostBtn.classList.remove('active');
+                        boostBtn.innerHTML = '<i class="fas fa-bolt"></i><span>Усилить</span>';
+                        this.showNotification('Усиление завершено', 'info');
+                    }, 10000);
+                } else {
+                    boostBtn.classList.remove('active');
+                    boostBtn.innerHTML = '<i class="fas fa-bolt"></i><span>Усилить</span>';
                 }
             }
             
-            updatePositionDisplay() {
-                // Обновляем отображение позиции на карте
+            showStats() {
+                const timeActive = this.startTime ? 
+                    Math.round((Date.now() - this.startTime) / 1000) : 0;
+                
+                const statsMessage = `
+                    Активное время: ${timeActive} сек
+                    Обнаружено движений: ${this.movementCount}
+                    Общее смещение: ${Math.round(this.totalMovement)} px
+                    Текущая чувствительность: ${this.sensitivity}x
+                    ${this.turboMode ? '⚡ Турбо-режим: ВКЛ' : ''}
+                    ${this.smoothMode ? '🔄 Сглаживание: ВКЛ' : ''}
+                `.trim().split('\n').map(line => line.trim()).join('\n');
+                
+                this.showNotification(statsMessage, 'info', 5000);
+            }
+            
+            updateDisplay() {
+                // Обновляем отображение позиции
                 if (this.userImage) {
                     const centerX = this.canvas.width / 2;
                     const centerY = this.canvas.height / 2;
@@ -1445,34 +1383,42 @@
                     }
                 });
                 
-                // Управление GPS
-                document.getElementById('startGPSBtn').addEventListener('click', () => {
-                    this.startGPSTracking();
+                // Управление отслеживанием
+                document.getElementById('startTrackingBtn').addEventListener('click', () => {
+                    this.startMovementTracking();
                 });
                 
-                document.getElementById('calibrateBtn').addEventListener('click', () => {
-                    this.calibrateGPS();
+                document.getElementById('boostBtn').addEventListener('click', () => {
+                    this.activateBoost();
                 });
                 
-                document.getElementById('clearTrailBtn').addEventListener('click', () => {
-                    this.clearTrail();
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.resetView();
                 });
                 
-                document.getElementById('saveBtn').addEventListener('click', () => {
-                    this.saveSettings();
+                document.getElementById('statsBtn').addEventListener('click', () => {
+                    this.showStats();
                 });
                 
-                // Настройки
-                document.getElementById('gpsScale').addEventListener('change', (e) => {
-                    this.gpsScale = parseInt(e.target.value) || 1000;
+                // Настройки чувствительности
+                const sensitivitySlider = document.getElementById('sensitivitySlider');
+                const sensitivityValue = document.getElementById('sensitivityValue');
+                
+                sensitivitySlider.addEventListener('input', (e) => {
+                    this.sensitivity = parseInt(e.target.value);
+                    sensitivityValue.textContent = `${this.sensitivity}x`;
+                    
+                    // Визуальная обратная связь
+                    this.showNotification(`Чувствительность: ${this.sensitivity}x`, 'info', 1000);
                 });
                 
-                document.getElementById('toggleTrail').addEventListener('click', () => {
-                    this.toggleTrail();
+                // Режимы
+                document.getElementById('turboModeBtn').addEventListener('click', () => {
+                    this.toggleTurboMode();
                 });
                 
-                document.getElementById('toggleAutoCenter').addEventListener('click', () => {
-                    this.toggleAutoCenter();
+                document.getElementById('smoothModeBtn').addEventListener('click', () => {
+                    this.toggleSmoothMode();
                 });
                 
                 // Масштабирование
@@ -1552,7 +1498,7 @@
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                window.navigator = new GPSNavigator();
+                window.navigator = new SensitiveNavigator();
             }, 100);
         });
         
