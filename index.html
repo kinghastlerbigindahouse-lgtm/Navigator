@@ -694,9 +694,26 @@
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
+        
+        /* Debug info for orientation */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #4CD964;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            z-index: 1001;
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Debug info (можно удалить в production) -->
+    <div class="debug-info" id="debug-info"></div>
+    
     <!-- Splash Screen -->
     <div class="splash-screen" id="splash-screen">
         <div class="splash-logo">
@@ -867,6 +884,7 @@
             const installPrompt = document.getElementById('install-prompt');
             const installConfirm = document.getElementById('install-confirm');
             const installCancel = document.getElementById('install-cancel');
+            const debugInfo = document.getElementById('debug-info');
             
             // Hide splash screen after load
             setTimeout(() => {
@@ -949,7 +967,7 @@
             let isRouteCompleted = false;
             let lastPointPosition = null;
             
-            // Initialize arrow
+            // Initialize arrow - острый угол треугольника смотрит вверх
             currentRotation = 0;
             targetRotation = 0;
             compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
@@ -985,45 +1003,128 @@
             
             rotateArrow();
             
-            // Device Orientation
+            // Device Orientation - ИСПРАВЛЕННАЯ ЛОГИКА
             let isDeviceOrientationSupported = false;
+            let calibrationOffset = 0;
+            let lastAlpha = 0;
             
             if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', function(event) {
-                    if (event.alpha !== null) {
-                        isDeviceOrientationSupported = true;
-                        targetRotation = 360 - event.alpha + 90;
-                    }
-                });
-                
-                setTimeout(() => {
-                    if (!isDeviceOrientationSupported) {
-                        setupEmulatedRotation();
-                    }
-                }, 2000);
+                // Запрашиваем разрешение на доступ к датчикам (необходимо для iOS 13+)
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                startOrientationTracking();
+                            } else {
+                                setupEmulatedRotation();
+                            }
+                        })
+                        .catch(() => {
+                            setupEmulatedRotation();
+                        });
+                } else {
+                    // Для Android и старых iOS
+                    startOrientationTracking();
+                }
             } else {
                 setupEmulatedRotation();
             }
             
+            function startOrientationTracking() {
+                window.addEventListener('deviceorientation', handleOrientation);
+                isDeviceOrientationSupported = true;
+                debugInfo.style.display = 'block';
+                debugInfo.textContent = 'Датчик: активен';
+            }
+            
+            function handleOrientation(event) {
+                if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
+                    // alpha: поворот вокруг оси Z (0-360 градусов)
+                    // beta: наклон вперед/назад (-180 до 180)
+                    // gamma: наклон влево/вправо (-90 до 90)
+                    
+                    const alpha = event.alpha; // 0-360, где 0 = север
+                    const beta = event.beta;   // наклон вперед/назад
+                    const gamma = event.gamma; // наклон влево/вправо
+                    
+                    // Отладочная информация
+                    debugInfo.innerHTML = `
+                        α: ${alpha.toFixed(1)}°<br>
+                        β: ${beta.toFixed(1)}°<br>
+                        γ: ${gamma.toFixed(1)}°
+                    `;
+                    
+                    // Калибровка: при первом измерении запоминаем начальную ориентацию
+                    if (calibrationOffset === 0) {
+                        calibrationOffset = alpha;
+                    }
+                    
+                    // Вычисляем относительный поворот относительно начальной ориентации
+                    let relativeRotation = alpha - calibrationOffset;
+                    
+                    // Нормализуем угол в диапазоне 0-360
+                    if (relativeRotation < 0) relativeRotation += 360;
+                    if (relativeRotation >= 360) relativeRotation -= 360;
+                    
+                    // Плавное обновление
+                    const rotationChange = relativeRotation - lastAlpha;
+                    
+                    // Игнорируем резкие скачки
+                    if (Math.abs(rotationChange) < 30) {
+                        lastAlpha = relativeRotation;
+                        
+                        // Преобразуем поворот телефона в поворот стрелки
+                        // Когда телефон поворачивается вправо (по часовой), стрелка должна поворачиваться вправо
+                        // Острый угол треугольника должен указывать в направлении поворота
+                        targetRotation = relativeRotation;
+                    }
+                }
+            }
+            
+            // Калибровка по двойному тапу
+            mapContainer.addEventListener('dblclick', function() {
+                calibrationOffset = 0;
+                lastAlpha = 0;
+                debugInfo.textContent = 'Датчик: перекалиброван';
+            });
+            
             function setupEmulatedRotation() {
+                debugInfo.style.display = 'block';
+                debugInfo.textContent = 'Датчик: эмуляция';
+                
+                // Медленное вращение по умолчанию
                 setInterval(() => {
                     if (!isNavigating && !isRouteCompleted) {
                         targetRotation += 0.2;
                     }
                 }, 100);
                 
-                mapContainer.addEventListener('click', function(e) {
-                    if (isSelectingPoints || e.target.closest('.route-menu') || e.target.closest('.menu-toggle')) return;
+                // Эмуляция поворота при свайпе по карте
+                let touchStartX = 0;
+                let touchStartRotation = 0;
+                
+                mapContainer.addEventListener('touchstart', function(e) {
+                    if (isSelectingPoints) return;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartRotation = targetRotation;
+                });
+                
+                mapContainer.addEventListener('touchmove', function(e) {
+                    if (isSelectingPoints || !touchStartX) return;
                     
-                    const rect = mapContainer.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const centerX = rect.width / 2;
+                    const touchCurrentX = e.touches[0].clientX;
+                    const deltaX = touchCurrentX - touchStartX;
                     
-                    if (clickX < centerX - 50) {
-                        targetRotation -= 25;
-                    } else if (clickX > centerX + 50) {
-                        targetRotation += 25;
-                    }
+                    // Поворачиваем стрелку в соответствии с движением пальца
+                    // Движение вправо = поворот вправо
+                    // Движение влево = поворот влево
+                    targetRotation = touchStartRotation + (deltaX * 0.5);
+                    
+                    e.preventDefault();
+                });
+                
+                mapContainer.addEventListener('touchend', function() {
+                    touchStartX = 0;
                 });
             }
             
@@ -1297,13 +1398,14 @@
                     if (nextPoint) {
                         const dx = nextPoint.x - point.x;
                         const dy = nextPoint.y - point.y;
-                        targetRotation = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+                        // Стрелка смотрит острым углом в направлении движения
+                        targetRotation = Math.atan2(dy, dx) * 180 / Math.PI;
                     } else {
                         if (currentStep > 0) {
                             const prevPoint = routePoints[currentStep - 1];
                             const dx = point.x - prevPoint.x;
                             const dy = point.y - prevPoint.y;
-                            targetRotation = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+                            targetRotation = Math.atan2(dy, dx) * 180 / Math.PI;
                         }
                     }
                     
