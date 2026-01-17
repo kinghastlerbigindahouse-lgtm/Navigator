@@ -20,6 +20,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
         body {
@@ -31,6 +32,7 @@
             width: 100vw;
             position: relative;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         
         .app-container {
@@ -41,6 +43,9 @@
             position: relative;
             background: #000;
             overflow: hidden;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* Install Prompt */
@@ -142,6 +147,11 @@
             overflow: hidden;
             background: #0a0a0a;
             cursor: grab;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-font-smoothing: antialiased;
         }
         
         .map-container:active {
@@ -149,15 +159,22 @@
         }
         
         #map-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
             display: none;
             position: absolute;
             top: 0;
             left: 0;
             transform-origin: 0 0;
             transition: transform 0.1s ease-out;
+            max-width: none;
+            max-height: none;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            will-change: transform;
         }
         
         .default-map {
@@ -181,40 +198,45 @@
             color: rgba(255, 255, 255, 0.5);
         }
         
-        /* Compass arrow - ИЗМЕНЕНО: уменьшен размер */
+        /* Compass arrow */
         .compass-arrow {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(0deg);
-            width: 50px; /* Уменьшено с 60px */
-            height: 50px; /* Уменьшено с 60px */
+            width: 50px;
+            height: 50px;
             z-index: 15;
-            transition: transform 0.2s ease-out;
+            transition: transform 0.5s ease-out, left 0.5s ease-out, top 0.5s ease-out;
             cursor: pointer;
             user-select: none;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
         
         .triangle {
             width: 0;
             height: 0;
-            border-left: 16px solid transparent; /* Уменьшено с 20px */
-            border-right: 16px solid transparent; /* Уменьшено с 20px */
-            border-bottom: 32px solid #FF3B30; /* Уменьшено с 40px */
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-bottom: 32px solid #FF3B30;
             position: relative;
             filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.7));
+            -webkit-filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.7));
         }
         
         .triangle::after {
             content: '';
             position: absolute;
             top: 5px;
-            left: -18px; /* Увеличен отступ для более широкого круга */
-            width: 36px; /* Увеличено с 30px для более широкого круга */
-            height: 36px; /* Увеличено с 30px для более широкого круга */
+            left: -18px;
+            width: 36px;
+            height: 36px;
             background: #FF3B30;
             border-radius: 50%;
-            opacity: 0.3; /* Сделано более прозрачным (было 0.5) */
+            opacity: 0.3;
             animation: pulse 2s infinite;
         }
         
@@ -241,6 +263,8 @@
             display: none;
             flex-direction: column;
             border: 1px solid rgba(255, 255, 255, 0.15);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
         
         .route-menu.active {
@@ -281,6 +305,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
         
         .close-menu:hover {
@@ -350,6 +375,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            touch-action: manipulation;
         }
         
         .menu-buttons {
@@ -370,6 +396,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            touch-action: manipulation;
         }
         
         .build-route-btn {
@@ -381,6 +408,7 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
+            touch-action: manipulation;
         }
         
         /* Route points on map */
@@ -396,6 +424,8 @@
             pointer-events: none;
             display: none;
             box-shadow: 0 0 6px rgba(0, 122, 255, 0.8);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
         
         .route-line {
@@ -406,6 +436,8 @@
             height: 2px;
             background: linear-gradient(to right, #007AFF, #00C6FF);
             transform-origin: 0 0;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
         
         /* Search and controls */
@@ -434,6 +466,7 @@
             color: #fff;
             font-size: 15px;
             font-weight: 500;
+            touch-action: manipulation;
         }
         
         .search-input::placeholder {
@@ -456,6 +489,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+            touch-action: manipulation;
         }
         
         .search-btn i {
@@ -481,6 +515,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
         
         .mode-btn.active {
@@ -505,6 +540,9 @@
             z-index: 20;
             overflow: hidden;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+            touch-action: manipulation;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
         
         .upload-map-btn img {
@@ -541,6 +579,7 @@
             cursor: pointer;
             z-index: 20;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+            touch-action: manipulation;
         }
         
         /* Zoom controls */
@@ -567,6 +606,18 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            transition: transform 0.1s, background-color 0.2s;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        
+        .zoom-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(0, 122, 255, 0.3);
         }
         
         /* Pulsating circle in search */
@@ -732,9 +783,63 @@
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
+        
+        /* Edge indicators */
+        .edge-indicator {
+            position: absolute;
+            z-index: 10;
+            background: rgba(0, 122, 255, 0.7);
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            pointer-events: none;
+        }
+        
+        .edge-top {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .edge-bottom {
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .edge-left {
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .edge-right {
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Prevent text selection */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        /* Hardware acceleration fix */
+        .hardware-accelerated {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-perspective: 1000;
+            perspective: 1000;
+        }
     </style>
 </head>
-<body>
+<body class="no-select">
     <!-- Splash Screen -->
     <div class="splash-screen" id="splash-screen">
         <div class="splash-logo">
@@ -776,6 +881,12 @@
                 <p>Загрузите карту</p>
             </div>
             <img id="map-image" alt="Загруженная карта">
+            
+            <!-- Edge indicators -->
+            <div class="edge-indicator edge-top" id="edge-top">↑ Новый участок карты</div>
+            <div class="edge-indicator edge-bottom" id="edge-bottom">↓ Новый участок карты</div>
+            <div class="edge-indicator edge-left" id="edge-left">← Новый участок карты</div>
+            <div class="edge-indicator edge-right" id="edge-right">→ Новый участок карты</div>
             
             <!-- Route notification -->
             <div class="route-notification" id="route-notification">
@@ -909,12 +1020,29 @@
             ]
         };
         
+        // Prevent context menu
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.map-container') || 
+                e.target.closest('.zoom-btn') ||
+                e.target.closest('.menu-toggle') ||
+                e.target.closest('.upload-map-btn')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
         document.addEventListener('DOMContentLoaded', function() {
             // PWA Elements
             const splashScreen = document.getElementById('splash-screen');
             const installPrompt = document.getElementById('install-prompt');
             const installConfirm = document.getElementById('install-confirm');
             const installCancel = document.getElementById('install-cancel');
+            
+            // Edge indicators
+            const edgeTop = document.getElementById('edge-top');
+            const edgeBottom = document.getElementById('edge-bottom');
+            const edgeLeft = document.getElementById('edge-left');
+            const edgeRight = document.getElementById('edge-right');
             
             // Hide splash screen after load
             setTimeout(() => {
@@ -1000,7 +1128,7 @@
             let isRouteCompleted = false;
             let lastPointPosition = null;
             
-            // Zoom state
+            // Карта в полном размере
             let scale = 1;
             let offsetX = 0;
             let offsetY = 0;
@@ -1014,48 +1142,99 @@
             let initialScale = 1;
             let isMapLoaded = false;
             
-            // Размеры карты
-            let mapWidth = 0;
-            let mapHeight = 0;
+            // Размеры карты и контейнера
+            let originalMapWidth = 0;
+            let originalMapHeight = 0;
+            let containerWidth = 0;
+            let containerHeight = 0;
             
-            // Позиция треугольника в координатах карты (не в экранных координатах)
-            // Стрелка изначально в центре (50%, 50%)
-            let triangleMapX = 50; // Процент от ширины карты
-            let triangleMapY = 50; // Процент от высоты карты
+            // Позиция треугольника в абсолютных координатах карты (пиксели)
+            let triangleX = 0;
+            let triangleY = 0;
             
             // Для плавного перемещения стрелки
             let animationFrameId = null;
             
-            // Функция для ограничения смещения карты (чтобы не выходила за рамки)
+            // НАСТРОЙКИ НАВИГАЦИИ
+            const navigationSpeed = 50; // Пикселей в секунду (медленная скорость)
+            const navigationScale = 2; // Масштаб при навигации
+            const zoomTransitionTime = 1500; // Время плавного приближения (мс)
+            
+            // Для плавного зума
+            let zoomAnimationId = null;
+            let currentZoomStart = 1;
+            let targetZoom = 1;
+            let zoomStartTime = 0;
+            
+            // НОВАЯ ПЕРЕМЕННАЯ: минимальный масштаб (чтобы карта полностью помещалась в контейнер)
+            let minScale = 0.1;
+            
+            // Таймеры для предотвращения множественных кликов
+            let zoomInClickTime = 0;
+            let zoomOutClickTime = 0;
+            const CLICK_DELAY = 300; // мс между кликами
+            
+            // НОВАЯ ФУНКЦИЯ: плавное центрирование карты на стрелке в каждом кадре
+            function smoothCenterMapOnArrowContinuously() {
+                if (!isMapLoaded) return;
+                
+                const containerRect = mapContainer.getBoundingClientRect();
+                
+                // Центр контейнера
+                const centerX = containerRect.width / 2;
+                const centerY = containerRect.height / 2;
+                
+                // Вычисляем смещение, чтобы стрелка оказалась в центре
+                offsetX = centerX - triangleX * scale;
+                offsetY = centerY - triangleY * scale;
+                
+                // Ограничиваем смещение
+                constrainOffset();
+                
+                updateMapTransform();
+            }
+            
+            // Обновляем функцию ограничения смещения для навигации
             function constrainOffset() {
                 if (!isMapLoaded) return;
                 
-                const rect = mapContainer.getBoundingClientRect();
-                const containerWidth = rect.width;
-                const containerHeight = rect.height;
-                
-                // При object-fit: cover, изображение заполняет весь контейнер
-                // Вычисляем видимую область карты
-                const scaledWidth = containerWidth * scale;
-                const scaledHeight = containerHeight * scale;
+                // Вычисляем размеры масштабированной карты
+                const scaledWidth = originalMapWidth * scale;
+                const scaledHeight = originalMapHeight * scale;
                 
                 // Максимальное смещение (чтобы карта не уходила за границы контейнера)
-                const maxOffsetX = Math.max(0, (scaledWidth - containerWidth) / 2);
-                const maxOffsetY = Math.max(0, (scaledHeight - containerHeight) / 2);
-                const minOffsetX = -maxOffsetX;
-                const minOffsetY = -maxOffsetY;
+                const maxOffsetX = Math.max(0, (scaledWidth - containerWidth));
+                const maxOffsetY = Math.max(0, (scaledHeight - containerHeight));
+                const minOffsetX = Math.min(0, -(scaledWidth - containerWidth));
+                const minOffsetY = Math.min(0, -(scaledHeight - containerHeight));
                 
-                // Ограничиваем смещение
-                offsetX = Math.max(minOffsetX, Math.min(maxOffsetX, offsetX));
-                offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, offsetY));
+                // Если мы в режиме навигации, не ограничиваем смещение так жестко
+                // чтобы стрелка могла подходить к краю карты
+                if (isNavigating) {
+                    // Разрешаем большее смещение, чтобы стрелка могла быть ближе к краю
+                    offsetX = Math.max(minOffsetX - 50, Math.min(maxOffsetX + 50, offsetX));
+                    offsetY = Math.max(minOffsetY - 50, Math.min(maxOffsetY + 50, offsetY));
+                } else {
+                    // Ограничиваем смещение
+                    offsetX = Math.max(minOffsetX, Math.min(maxOffsetX, offsetX));
+                    offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, offsetY));
+                }
             }
             
-            // Initialize arrow - острый угол треугольника смотрит вверх
-            currentRotation = 0;
-            targetRotation = 0;
-            updateTrianglePosition();
+            // Инициализация стрелки
+            function initializeArrow() {
+                if (isMapLoaded) {
+                    // Ставим стрелку в центр карты
+                    triangleX = originalMapWidth / 2;
+                    triangleY = originalMapHeight / 2;
+                } else {
+                    triangleX = 0;
+                    triangleY = 0;
+                }
+                updateTrianglePosition();
+            }
             
-            // Обновление позиции треугольника на основе координат карты
+            // Обновление позиции треугольника
             function updateTrianglePosition() {
                 if (!isMapLoaded) {
                     compassArrow.style.left = '50%';
@@ -1063,25 +1242,41 @@
                     return;
                 }
                 
-                // Преобразуем проценты в пиксели с учетом зума и смещения
-                const mapRect = mapContainer.getBoundingClientRect();
-                const mapWidth = mapRect.width;
-                const mapHeight = mapRect.height;
-                
-                // Вычисляем позицию на карте без учета зума
-                const baseX = (triangleMapX / 100) * mapWidth;
-                const baseY = (triangleMapY / 100) * mapHeight;
-                
-                // Применяем трансформацию зума
-                const screenX = baseX * scale + offsetX;
-                const screenY = baseY * scale + offsetY;
+                // Преобразуем координаты карты в экранные координаты
+                const screenX = triangleX * scale + offsetX;
+                const screenY = triangleY * scale + offsetY;
                 
                 // Устанавливаем позицию треугольника
                 compassArrow.style.left = `${screenX}px`;
                 compassArrow.style.top = `${screenY}px`;
+                
+                // Проверяем, близко ли стрелка к границам
+                checkArrowNearEdges();
             }
             
-            // Получить текущие координаты стрелки в пикселях (экрана)
+            // Проверка, находится ли стрелка близко к границам видимой области
+            function checkArrowNearEdges() {
+                if (!isMapLoaded) return;
+                
+                const containerRect = mapContainer.getBoundingClientRect();
+                const arrowRect = compassArrow.getBoundingClientRect();
+                
+                // Позиция центра стрелки относительно контейнера
+                const arrowCenterX = arrowRect.left + arrowRect.width / 2 - containerRect.left;
+                const arrowCenterY = arrowRect.top + arrowRect.height / 2 - containerRect.top;
+                
+                // Определяем пороговое расстояние от границ (20% от размера контейнера)
+                const thresholdX = containerRect.width * 0.2;
+                const thresholdY = containerRect.height * 0.2;
+                
+                // Показываем индикаторы, если стрелка близко к границам
+                edgeTop.style.display = arrowCenterY < thresholdY ? 'block' : 'none';
+                edgeBottom.style.display = arrowCenterY > containerRect.height - thresholdY ? 'block' : 'none';
+                edgeLeft.style.display = arrowCenterX < thresholdX ? 'block' : 'none';
+                edgeRight.style.display = arrowCenterX > containerRect.width - thresholdX ? 'block' : 'none';
+            }
+            
+            // Получить текущие экранные координаты стрелки
             function getArrowScreenPosition() {
                 const arrowRect = compassArrow.getBoundingClientRect();
                 const containerRect = mapContainer.getBoundingClientRect();
@@ -1092,36 +1287,166 @@
                 };
             }
             
-            // Плавное перемещение треугольника к целевой точке
-            function moveTriangleToPoint(targetX, targetY, duration = 2000) {
-                const startX = triangleMapX;
-                const startY = triangleMapY;
-                const startTime = performance.now();
+            // Получить координаты карты из экранных координат
+            function screenToMapCoordinates(screenX, screenY) {
+                return {
+                    x: (screenX - offsetX) / scale,
+                    y: (screenY - offsetY) / scale
+                };
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: вычисление минимального масштаба для полного отображения карты
+            function calculateMinScale() {
+                if (!isMapLoaded) return 0.1;
                 
-                function animate(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                // Вычисляем масштаб, при котором карта полностью помещается в контейнер
+                const scaleX = containerWidth / originalMapWidth;
+                const scaleY = containerHeight / originalMapHeight;
+                
+                // Берем меньший масштаб, чтобы карта полностью помещалась
+                return Math.min(scaleX, scaleY);
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: вычисление максимального масштаба (отдаления)
+            function calculateMaxScale() {
+                if (!isMapLoaded) return 5;
+                
+                // Максимальный масштаб - 5, но не меньше минимального
+                return Math.max(5, minScale);
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: ограничение масштаба
+            function constrainScale(newScale) {
+                if (!isMapLoaded) return newScale;
+                
+                // Вычисляем текущие минимальный и максимальный масштабы
+                const currentMinScale = calculateMinScale();
+                const currentMaxScale = calculateMaxScale();
+                
+                // Ограничиваем масштаб
+                return Math.max(currentMinScale, Math.min(currentMaxScale, newScale));
+            }
+            
+            // ОБНОВЛЕННАЯ ФУНКЦИЯ: плавное центрирование карты на стрелке с плавным зумом
+            function smoothCenterMapOnArrow(targetScale = null) {
+                if (!isMapLoaded) return;
+                
+                if (zoomAnimationId) {
+                    cancelAnimationFrame(zoomAnimationId);
+                    zoomAnimationId = null;
+                }
+                
+                const containerRect = mapContainer.getBoundingClientRect();
+                
+                // Используем переданный масштаб или текущий
+                let newScale = targetScale !== null ? targetScale : scale;
+                
+                // Ограничиваем масштаб
+                newScale = constrainScale(newScale);
+                
+                // Центр контейнера
+                const centerX = containerRect.width / 2;
+                const centerY = containerRect.height / 2;
+                
+                // Вычисляем целевое смещение, чтобы стрелка оказалась в центре
+                const targetOffsetX = centerX - triangleX * newScale;
+                const targetOffsetY = centerY - triangleY * newScale;
+                
+                // Сохраняем начальные значения для анимации
+                const startScale = scale;
+                const startOffsetX = offsetX;
+                const startOffsetY = offsetY;
+                currentZoomStart = startScale;
+                targetZoom = newScale;
+                zoomStartTime = performance.now();
+                
+                // Функция плавной анимации
+                function animateZoom(currentTime) {
+                    const elapsed = currentTime - zoomStartTime;
+                    const progress = Math.min(elapsed / zoomTransitionTime, 1);
                     
-                    // Плавное перемещение с ease-in-out
+                    // Плавное изменение с ease-in-out
                     const easeProgress = progress < 0.5 
                         ? 2 * progress * progress 
                         : 1 - Math.pow(-2 * progress + 2, 2) / 2;
                     
-                    triangleMapX = startX + (targetX - startX) * easeProgress;
-                    triangleMapY = startY + (targetY - startY) * easeProgress;
+                    // Плавно изменяем масштаб
+                    scale = startScale + (newScale - startScale) * easeProgress;
                     
+                    // Плавно изменяем смещение
+                    offsetX = startOffsetX + (targetOffsetX - startOffsetX) * easeProgress;
+                    offsetY = startOffsetY + (targetOffsetY - startOffsetY) * easeProgress;
+                    
+                    // Ограничиваем смещение
+                    constrainOffset();
+                    
+                    updateMapTransform();
+                    
+                    if (progress < 1) {
+                        zoomAnimationId = requestAnimationFrame(animateZoom);
+                    } else {
+                        zoomAnimationId = null;
+                    }
+                }
+                
+                zoomAnimationId = requestAnimationFrame(animateZoom);
+            }
+            
+            // НОВАЯ ФУНКЦИЯ: плавное перемещение стрелки с постоянной скоростью
+            function moveTriangleSmoothlyToPoint(targetX, targetY) {
+                if (!isMapLoaded) return;
+                
+                // Отменяем предыдущую анимацию
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+                
+                const startX = triangleX;
+                const startY = triangleY;
+                const startTime = performance.now();
+                
+                // Вычисляем расстояние между точками
+                const dx = targetX - startX;
+                const dy = targetY - startY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Вычисляем время движения исходя из расстояния и скорости
+                const duration = (distance / navigationSpeed) * 1000; // мс
+                
+                // Вычисляем угол направления
+                const angleToTarget = Math.atan2(dy, dx) * 180 / Math.PI;
+                targetRotation = angleToTarget + 90;
+                
+                // УСТАНОВЛИВАЕМ МАСШТАБ НАВИГАЦИИ НЕМЕДЛЕННО
+                if (scale !== navigationScale) {
+                    scale = navigationScale;
+                }
+                
+                // Функция анимации движения стрелки
+                function animate(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Линейное движение для равномерной скорости
+                    triangleX = startX + dx * progress;
+                    triangleY = startY + dy * progress;
+                    
+                    // ЦЕНТРИРУЕМ КАРТУ НА СТРЕЛКЕ В КАЖДОМ КАДРЕ
+                    smoothCenterMapOnArrowContinuously();
+                    
+                    // Обновляем позицию стрелки
                     updateTrianglePosition();
                     
                     if (progress < 1) {
                         animationFrameId = requestAnimationFrame(animate);
                     } else {
                         animationFrameId = null;
+                        // Вызываем обработчик завершения движения
+                        onArrowMovementComplete();
                     }
                 }
                 
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
                 animationFrameId = requestAnimationFrame(animate);
             }
             
@@ -1139,63 +1464,174 @@
             
             rotateArrow();
             
-            // Update map image transform
+            // Обновление трансформации карты
             function updateMapTransform() {
                 if (isMapLoaded) {
-                    // Ограничиваем смещение
-                    constrainOffset();
-                    
                     mapImage.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-                    updateTrianglePosition(); // Обновляем позицию треугольника при изменении зума
+                    updateTrianglePosition();
+                    checkArrowNearEdges();
+                    updateRouteElements();
                 }
             }
             
-            // НОВЫЕ ФУНКЦИИ ДЛЯ ЗУМА ОТНОСИТЕЛЬНО ЦЕНТРА СТРЕЛКИ
-            function zoomRelativeToArrow(zoomFactor) {
+            // ИСПРАВЛЕННЫЕ ФУНКЦИИ: зум с предотвращением множественных кликов
+            function zoomIn() {
+                const now = Date.now();
+                if (now - zoomInClickTime < CLICK_DELAY) return;
+                zoomInClickTime = now;
+                
                 if (!isMapLoaded) return;
                 
                 // Получаем текущую позицию стрелки на экране
-                const arrowPos = getArrowScreenPosition();
+                const arrowScreenPos = getArrowScreenPosition();
                 
-                // Преобразуем координаты стрелки в координаты карты с учетом текущего зума
-                const worldX = (arrowPos.x - offsetX) / scale;
-                const worldY = (arrowPos.y - offsetY) / scale;
+                // Преобразуем координаты стрелки в координаты карты
+                const worldX = (arrowScreenPos.x - offsetX) / scale;
+                const worldY = (arrowScreenPos.y - offsetY) / scale;
                 
-                // Применяем зум
-                const newScale = Math.max(1, Math.min(5, scale * zoomFactor));
+                // Применяем зум с ограничением
+                const newScale = constrainScale(scale * 1.2);
                 
-                // Если достигнут минимум или максимум зума, не делаем ничего
-                if ((zoomFactor > 1 && newScale === scale) || (zoomFactor < 1 && newScale === scale)) {
+                // Если масштаб не изменился, не делаем ничего
+                if (Math.abs(newScale - scale) < 0.001) {
                     return;
                 }
                 
                 // Корректируем смещение чтобы стрелка осталась на том же месте на экране
-                offsetX = arrowPos.x - worldX * newScale;
-                offsetY = arrowPos.y - worldY * newScale;
+                offsetX = arrowScreenPos.x - worldX * newScale;
+                offsetY = arrowScreenPos.y - worldY * newScale;
                 
                 // Обновляем масштаб
                 scale = newScale;
                 
+                // Ограничиваем смещение
+                constrainOffset();
+                
                 updateMapTransform();
             }
             
-            // Zoom functions - ИЗМЕНЕНО: теперь зум относительно центра стрелки
-            function zoomIn() {
-                zoomRelativeToArrow(1.2);
-            }
-            
             function zoomOut() {
-                zoomRelativeToArrow(1/1.2);
+                const now = Date.now();
+                if (now - zoomOutClickTime < CLICK_DELAY) return;
+                zoomOutClickTime = now;
+                
+                if (!isMapLoaded) return;
+                
+                // Получаем текущую позицию стрелки на экране
+                const arrowScreenPos = getArrowScreenPosition();
+                
+                // Преобразуем координаты стрелки в координаты карты
+                const worldX = (arrowScreenPos.x - offsetX) / scale;
+                const worldY = (arrowScreenPos.y - offsetY) / scale;
+                
+                // Применяем зум с ограничением
+                const newScale = constrainScale(scale * (1/1.2));
+                
+                // Если масштаб не изменился, не делаем ничего
+                if (Math.abs(newScale - scale) < 0.001) {
+                    return;
+                }
+                
+                // Корректируем смещение чтобы стрелка осталась на том же месте на экране
+                offsetX = arrowScreenPos.x - worldX * newScale;
+                offsetY = arrowScreenPos.y - worldY * newScale;
+                
+                // Обновляем масштаб
+                scale = newScale;
+                
+                // Ограничиваем смещение
+                constrainOffset();
+                
+                updateMapTransform();
             }
             
-            // Zoom controls
-            zoomInBtn.addEventListener('click', zoomIn);
-            zoomOutBtn.addEventListener('click', zoomOut);
+            // Touch event handlers for zoom buttons
+            function setupZoomButtonEvents() {
+                // Для зума внутрь
+                zoomInBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    zoomIn();
+                    // Добавляем визуальную обратную связь
+                    this.style.backgroundColor = 'rgba(0, 122, 255, 0.3)';
+                });
+                
+                zoomInBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                zoomInBtn.addEventListener('touchcancel', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                // Для зума наружу
+                zoomOutBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    zoomOut();
+                    // Добавляем визуальную обратную связь
+                    this.style.backgroundColor = 'rgba(0, 122, 255, 0.3)';
+                });
+                
+                zoomOutBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                zoomOutBtn.addEventListener('touchcancel', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                // Для мыши/стилуса
+                zoomInBtn.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    zoomIn();
+                    this.style.backgroundColor = 'rgba(0, 122, 255, 0.3)';
+                });
+                
+                zoomInBtn.addEventListener('mouseup', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                zoomInBtn.addEventListener('mouseleave', function(e) {
+                    this.style.backgroundColor = '';
+                });
+                
+                zoomOutBtn.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    zoomOut();
+                    this.style.backgroundColor = 'rgba(0, 122, 255, 0.3)';
+                });
+                
+                zoomOutBtn.addEventListener('mouseup', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                zoomOutBtn.addEventListener('mouseleave', function(e) {
+                    this.style.backgroundColor = '';
+                });
+            }
             
-            // Touch and mouse events for zoom and pan (только когда карта загружена)
-            mapContainer.addEventListener('mousedown', startDrag);
-            mapContainer.addEventListener('touchstart', handleTouchStart);
-            mapContainer.addEventListener('wheel', handleWheel);
+            // Инициализация событий кнопок зума
+            setupZoomButtonEvents();
+            
+            // Touch and mouse events
+            function setupMapEvents() {
+                mapContainer.addEventListener('mousedown', startDrag);
+                mapContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+                mapContainer.addEventListener('wheel', handleWheel, { passive: false });
+                
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopTouch);
+                document.addEventListener('touchcancel', stopTouch);
+            }
+            
+            setupMapEvents();
             
             function startDrag(e) {
                 if (!isMapLoaded || isSelectingPoints) return;
@@ -1210,6 +1646,14 @@
             
             function handleTouchStart(e) {
                 if (!isMapLoaded || isSelectingPoints) return;
+                
+                // Останавливаем зум на кнопках
+                if (e.target.closest('.zoom-btn') || 
+                    e.target.closest('.menu-toggle') || 
+                    e.target.closest('.upload-map-btn')) {
+                    return;
+                }
+                
                 if (e.touches.length === 1) {
                     isDragging = true;
                     dragStartX = e.touches[0].clientX;
@@ -1230,9 +1674,6 @@
                 e.preventDefault();
             }
             
-            document.addEventListener('mousemove', handleDrag);
-            document.addEventListener('touchmove', handleTouchMove);
-            
             function handleDrag(e) {
                 if (!isMapLoaded || !isDragging) return;
                 
@@ -1242,6 +1683,7 @@
                 offsetX = startOffsetX + dx;
                 offsetY = startOffsetY + dy;
                 
+                constrainOffset();
                 updateMapTransform();
                 e.preventDefault();
             }
@@ -1256,6 +1698,7 @@
                     offsetX = startOffsetX + dx;
                     offsetY = startOffsetY + dy;
                     
+                    constrainOffset();
                     updateMapTransform();
                 } else if (isPinching && e.touches.length === 2) {
                     const touch1 = e.touches[0];
@@ -1265,7 +1708,10 @@
                         touch2.clientY - touch1.clientY
                     );
                     
-                    const newScale = Math.max(1, Math.min(5, initialScale * (currentDistance / initialPinchDistance)));
+                    let newScale = initialScale * (currentDistance / initialPinchDistance);
+                    
+                    // Ограничиваем масштаб
+                    newScale = constrainScale(newScale);
                     
                     // При изменении зума жестом тоже делаем его относительно центра между двумя пальцами
                     const midX = (touch1.clientX + touch2.clientX) / 2;
@@ -1274,7 +1720,7 @@
                     const screenMidX = midX - rect.left;
                     const screenMidY = midY - rect.top;
                     
-                    // Преобразуем координаты середины жеста в координаты карды
+                    // Преобразуем координаты середины жеста в координаты карты
                     const worldX = (screenMidX - offsetX) / scale;
                     const worldY = (screenMidY - offsetY) / scale;
                     
@@ -1285,6 +1731,7 @@
                     offsetX = screenMidX - worldX * scale;
                     offsetY = screenMidY - worldY * scale;
                     
+                    constrainOffset();
                     updateMapTransform();
                 }
                 e.preventDefault();
@@ -1305,11 +1752,11 @@
                 const worldX = (mouseX - offsetX) / scale;
                 const worldY = (mouseY - offsetY) / scale;
                 
-                // Применяем зум
-                const newScale = Math.max(1, Math.min(5, scale * zoomFactor));
+                // Применяем зум с ограничением
+                const newScale = constrainScale(scale * zoomFactor);
                 
-                // Если достигнут минимум или максимум зума, не делаем ничего
-                if ((zoomFactor > 1 && newScale === scale) || (zoomFactor < 1 && newScale === scale)) {
+                // Если масштаб не изменился, не делаем ничего
+                if (Math.abs(newScale - scale) < 0.001) {
                     return;
                 }
                 
@@ -1319,11 +1766,9 @@
                 
                 scale = newScale;
                 
+                constrainOffset();
                 updateMapTransform();
             }
-            
-            document.addEventListener('mouseup', stopDrag);
-            document.addEventListener('touchend', stopTouch);
             
             function stopDrag() {
                 isDragging = false;
@@ -1352,7 +1797,6 @@
             let lastAlpha = 0;
             
             if (window.DeviceOrientationEvent) {
-                // Запрашиваем разрешение на доступ к датчикам (необходимо для iOS 13+)
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                     DeviceOrientationEvent.requestPermission()
                         .then(permissionState => {
@@ -1366,7 +1810,6 @@
                             setupEmulatedRotation();
                         });
                 } else {
-                    // Для Android и старых iOS
                     startOrientationTracking();
                 }
             } else {
@@ -1382,27 +1825,20 @@
                 if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
                     const alpha = event.alpha;
                     
-                    // Калибровка: при первом измерении запоминаем начальную ориентацию
                     if (calibrationOffset === 0) {
                         calibrationOffset = alpha;
                     }
                     
-                    // Вычисляем относительный поворот относительно начальной ориентации
                     let relativeRotation = alpha - calibrationOffset;
                     
-                    // Нормализуем угол в диапазоне 0-360
                     if (relativeRotation < 0) relativeRotation += 360;
                     if (relativeRotation >= 360) relativeRotation -= 360;
                     
-                    // Плавное обновление
                     const rotationChange = relativeRotation - lastAlpha;
                     
-                    // Игнорируем резкие скачки
                     if (Math.abs(rotationChange) < 30) {
                         lastAlpha = relativeRotation;
                         
-                        // Преобразуем поворот телефона в поворот стрелки
-                        // Только если не в режиме навигации
                         if (!isNavigating) {
                             targetRotation = relativeRotation;
                         }
@@ -1410,7 +1846,19 @@
                 }
             }
             
-            // Load Map
+            function setupEmulatedRotation() {
+                // Эмуляция вращения для устройств без поддержки ориентации
+                let rotationAngle = 0;
+                setInterval(() => {
+                    if (!isNavigating) {
+                        rotationAngle += 0.5;
+                        if (rotationAngle >= 360) rotationAngle = 0;
+                        targetRotation = rotationAngle;
+                    }
+                }, 100);
+            }
+            
+            // Load Map - ОБНОВЛЕНО: вычисляем минимальный масштаб при загрузке
             mapUpload.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -1418,25 +1866,40 @@
                     reader.onload = function(event) {
                         const img = new Image();
                         img.onload = function() {
-                            mapWidth = img.width;
-                            mapHeight = img.height;
+                            // Сохраняем оригинальные размеры карты
+                            originalMapWidth = img.width;
+                            originalMapHeight = img.height;
                             
+                            // Получаем размеры контейнера
+                            const containerRect = mapContainer.getBoundingClientRect();
+                            containerWidth = containerRect.width;
+                            containerHeight = containerRect.height;
+                            
+                            // Устанавливаем карту
                             mapImage.src = event.target.result;
                             uploadPreview.src = event.target.result;
                             mapImage.style.display = 'block';
+                            mapImage.style.width = `${originalMapWidth}px`;
+                            mapImage.style.height = `${originalMapHeight}px`;
+                            
+                            // Применяем CSS для улучшения рендеринга
+                            mapImage.classList.add('hardware-accelerated');
+                            
                             defaultMap.style.display = 'none';
                             uploadPreview.style.display = 'block';
                             uploadBtn.querySelector('.upload-icon').style.display = 'none';
                             isMapLoaded = true;
                             
-                            // Сброс зума при загрузке новой карты
-                            scale = 1;
-                            offsetX = 0;
-                            offsetY = 0;
+                            // Вычисляем минимальный масштаб для полного отображения карты
+                            minScale = calculateMinScale();
                             
-                            // Стрелка изначально в центре
-                            triangleMapX = 50;
-                            triangleMapY = 50;
+                            // Устанавливаем начальный масштаб (карта полностью помещается в контейнер)
+                            scale = minScale;
+                            offsetX = (containerWidth - originalMapWidth * scale) / 2;
+                            offsetY = (containerHeight - originalMapHeight * scale) / 2;
+                            
+                            // Инициализируем стрелку
+                            initializeArrow();
                             
                             updateMapTransform();
                         };
@@ -1459,19 +1922,10 @@
                 const clickY = e.clientY - rect.top;
                 
                 // Преобразуем экранные координаты в координаты карты
-                const mapX = (clickX - offsetX) / scale;
-                const mapY = (clickY - offsetY) / scale;
-                
-                // Преобразуем координаты карты в проценты
-                const targetX = (mapX / rect.width) * 100;
-                const targetY = (mapY / rect.height) * 100;
-                
-                // Ограничиваем позицию в пределах карты (0-100%)
-                const clampedX = Math.max(0, Math.min(100, targetX));
-                const clampedY = Math.max(0, Math.min(100, targetY));
+                const mapCoords = screenToMapCoordinates(clickX, clickY);
                 
                 // Плавно перемещаем стрелку
-                moveTriangleToPoint(clampedX, clampedY, 500);
+                moveTriangleSmoothlyToPoint(mapCoords.x, mapCoords.y);
             });
             
             // Travel Modes
@@ -1509,22 +1963,20 @@
                 hideRouteMarkers();
             }
             
-            // Add Route Points (with zoom consideration)
+            // Add Route Points
             mapContainer.addEventListener('click', function(e) {
                 if (!isSelectingPoints || e.target.closest('.route-menu') || 
                     e.target.closest('.menu-toggle') || e.target.closest('.zoom-btn') ||
                     e.target.closest('.upload-map-btn') || e.target.closest('.compass-arrow')) return;
                 
                 const rect = mapContainer.getBoundingClientRect();
-                // Преобразуем координаты клика в координаты карты с учетом зума
                 const clickX = e.clientX - rect.left;
                 const clickY = e.clientY - rect.top;
                 
                 // Преобразуем экранные координаты в координаты карты
-                const mapX = (clickX - offsetX) / scale;
-                const mapY = (clickY - offsetY) / scale;
+                const mapCoords = screenToMapCoordinates(clickX, clickY);
                 
-                addRoutePoint(mapX, mapY);
+                addRoutePoint(mapCoords.x, mapCoords.y);
                 updateRoutePointsList();
             });
             
@@ -1534,9 +1986,17 @@
                 
                 const marker = document.createElement('div');
                 marker.className = 'route-point-marker';
-                marker.style.left = `${x}px`;
-                marker.style.top = `${y}px`;
+                marker.classList.add('hardware-accelerated');
+                
+                // Конвертируем координаты карты в экранные координаты для отображения
+                const screenX = x * scale + offsetX;
+                const screenY = y * scale + offsetY;
+                
+                marker.style.left = `${screenX}px`;
+                marker.style.top = `${screenY}px`;
                 marker.setAttribute('data-index', routePoints.length - 1);
+                marker.setAttribute('data-map-x', x);
+                marker.setAttribute('data-map-y', y);
                 mapContainer.appendChild(marker);
                 routeMarkers.push(marker);
                 
@@ -1553,15 +2013,22 @@
             function drawLine(x1, y1, x2, y2) {
                 const line = document.createElement('div');
                 line.className = 'route-line';
+                line.classList.add('hardware-accelerated');
                 
-                const dx = x2 - x1;
-                const dy = y2 - y1;
+                // Конвертируем координаты карты в экранные координаты
+                const screenX1 = x1 * scale + offsetX;
+                const screenY1 = y1 * scale + offsetY;
+                const screenX2 = x2 * scale + offsetX;
+                const screenY2 = y2 * scale + offsetY;
+                
+                const dx = screenX2 - screenX1;
+                const dy = screenY2 - screenY1;
                 const length = Math.sqrt(dx * dx + dy * dy);
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 
                 line.style.width = `${length}px`;
-                line.style.left = `${x1}px`;
-                line.style.top = `${y1}px`;
+                line.style.left = `${screenX1}px`;
+                line.style.top = `${screenY1}px`;
                 line.style.transform = `rotate(${angle}deg)`;
                 
                 mapContainer.appendChild(line);
@@ -1570,6 +2037,41 @@
                 if (isMenuOpen && !isNavigating) {
                     line.style.display = 'block';
                 }
+            }
+            
+            // Обновление позиций маркеров и линий при изменении зума/смещения
+            function updateRouteElements() {
+                routeMarkers.forEach((marker, index) => {
+                    if (index < routePoints.length) {
+                        const point = routePoints[index];
+                        const screenX = point.x * scale + offsetX;
+                        const screenY = point.y * scale + offsetY;
+                        marker.style.left = `${screenX}px`;
+                        marker.style.top = `${screenY}px`;
+                    }
+                });
+                
+                routeLines.forEach((line, index) => {
+                    if (index < routePoints.length - 1) {
+                        const point1 = routePoints[index];
+                        const point2 = routePoints[index + 1];
+                        
+                        const screenX1 = point1.x * scale + offsetX;
+                        const screenY1 = point1.y * scale + offsetY;
+                        const screenX2 = point2.x * scale + offsetX;
+                        const screenY2 = point2.y * scale + offsetY;
+                        
+                        const dx = screenX2 - screenX1;
+                        const dy = screenY2 - screenY1;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                        
+                        line.style.width = `${length}px`;
+                        line.style.left = `${screenX1}px`;
+                        line.style.top = `${screenY1}px`;
+                        line.style.transform = `rotate(${angle}deg)`;
+                    }
+                });
             }
             
             function updateRoutePointsList() {
@@ -1644,11 +2146,14 @@
                 isRouteCompleted = false;
                 routeNotification.classList.remove('active');
                 lastPointPosition = null;
-                // Треугольник остается на своем месте при очистке точек
+                
                 if (isMapLoaded) {
-                    scale = 1;
-                    offsetX = 0;
-                    offsetY = 0;
+                    // Сброс к начальному виду
+                    scale = minScale;
+                    offsetX = (containerWidth - originalMapWidth * scale) / 2;
+                    offsetY = (containerHeight - originalMapHeight * scale) / 2;
+                    triangleX = originalMapWidth / 2;
+                    triangleY = originalMapHeight / 2;
                     updateMapTransform();
                 }
             });
@@ -1665,7 +2170,7 @@
                 routeLines.forEach(line => line.style.display = 'none');
             }
             
-            // Build Route - УБРАНО УВЕДОМЛЕНИЕ "МАРШРУТ ПОСТРОЕН"
+            // Build Route
             buildRouteBtn.addEventListener('click', function() {
                 if (routePoints.length < 2) {
                     alert('Добавьте как минимум 2 точки для построения маршрута');
@@ -1677,7 +2182,7 @@
                 lastPointPosition = null;
             });
             
-            // Search - ОСТАВЛЕНО УВЕДОМЛЕНИЕ "МАРШРУТ ПОСТРОЕН" ТОЛЬКО ПОСЛЕ ПОИСКА
+            // Search
             searchBtn.addEventListener('click', function() {
                 const destination = searchInput.value.trim();
                 if (destination) {
@@ -1685,12 +2190,17 @@
                     routeNotification.classList.add('active');
                     
                     if (routePoints.length === 0) {
+                        // Генерируем случайные точки в видимой области
                         const rect = mapContainer.getBoundingClientRect();
                         
                         for (let i = 0; i < 4; i++) {
-                            const x = Math.random() * (rect.width - 80) + 40;
-                            const y = Math.random() * (rect.height - 80) + 40;
-                            addRoutePoint(x, y);
+                            // Генерируем координаты в пределах видимой области
+                            const screenX = Math.random() * (rect.width - 80) + 40;
+                            const screenY = Math.random() * (rect.height - 80) + 40;
+                            
+                            // Преобразуем в координаты карты
+                            const mapCoords = screenToMapCoordinates(screenX, screenY);
+                            addRoutePoint(mapCoords.x, mapCoords.y);
                         }
                         
                         updateRoutePointsList();
@@ -1735,20 +2245,12 @@
                 
                 hideRouteMarkers();
                 
-                // Перемещаем стрелку к первой точке маршрута
-                const rect = mapContainer.getBoundingClientRect();
+                // Начинаем плавное движение к первой точке
                 const firstPoint = routePoints[0];
-                const targetX = (firstPoint.x / rect.width) * 100;
-                const targetY = (firstPoint.y / rect.height) * 100;
-                
-                moveTriangleToPoint(targetX, targetY, 2000);
-                
-                // После завершения анимации начинаем навигацию по точкам
-                setTimeout(() => {
-                    navigateToNextPoint();
-                }, 2100);
+                moveTriangleSmoothlyToPoint(firstPoint.x, firstPoint.y);
             }
             
+            // Функция плавного перехода к следующей точке
             function navigateToNextPoint() {
                 if (currentStep >= routePoints.length - 1) {
                     // Достигли последней точки
@@ -1757,7 +2259,6 @@
                     lastPointPosition = lastPoint;
                     isRouteCompleted = true;
                     
-                    // Поворачиваем стрелку в направлении последнего отрезка
                     if (routePoints.length > 1) {
                         const prevPoint = routePoints[routePoints.length - 2];
                         const dx = lastPoint.x - prevPoint.x;
@@ -1768,27 +2269,28 @@
                     return;
                 }
                 
-                const currentPoint = routePoints[currentStep];
                 const nextPoint = routePoints[currentStep + 1];
+                moveTriangleSmoothlyToPoint(nextPoint.x, nextPoint.y);
+            }
+            
+            // Обработчик завершения движения стрелки
+            function onArrowMovementComplete() {
+                if (!isNavigating) return;
                 
-                // Перемещаем стрелку к следующей точке
-                const rect = mapContainer.getBoundingClientRect();
-                const targetX = (nextPoint.x / rect.width) * 100;
-                const targetY = (nextPoint.y / rect.height) * 100;
+                currentStep++;
                 
-                // Вычисляем угол направления к следующей точке
-                const dx = nextPoint.x - currentPoint.x;
-                const dy = nextPoint.y - currentPoint.y;
-                const angleToNextPoint = Math.atan2(dy, dx) * 180 / Math.PI;
-                targetRotation = angleToNextPoint + 90;
-                
-                moveTriangleToPoint(targetX, targetY, 2500);
-                
-                // Переходим к следующей точке после завершения анимации
-                setTimeout(() => {
-                    currentStep++;
-                    navigateToNextPoint();
-                }, 2600);
+                if (currentStep < routePoints.length) {
+                    // Если есть следующая точка, переходим к ней
+                    setTimeout(() => {
+                        navigateToNextPoint();
+                    }, 500); // Небольшая пауза между точками
+                } else {
+                    // Маршрут завершен
+                    stopNavigation();
+                    const lastPoint = routePoints[routePoints.length - 1];
+                    lastPointPosition = lastPoint;
+                    isRouteCompleted = true;
+                }
             }
             
             function stopNavigation() {
@@ -1797,15 +2299,17 @@
                     animationFrameId = null;
                 }
                 
+                if (zoomAnimationId) {
+                    cancelAnimationFrame(zoomAnimationId);
+                    zoomAnimationId = null;
+                }
+                
                 isNavigating = false;
                 navigationInfo.style.display = 'none';
                 
                 if (isRouteCompleted && lastPointPosition) {
-                    const rect = mapContainer.getBoundingClientRect();
-                    const targetX = (lastPointPosition.x / rect.width) * 100;
-                    const targetY = (lastPointPosition.y / rect.height) * 100;
-                    triangleMapX = targetX;
-                    triangleMapY = targetY;
+                    triangleX = lastPointPosition.x;
+                    triangleY = lastPointPosition.y;
                     updateTrianglePosition();
                 }
                 
@@ -1831,9 +2335,9 @@
                 }
             });
             
-            // Калибровка по тройному тапу (вместо двойного, чтобы не конфликтовать с перемещением стрелки)
+            // Калибровка по тройному тапу
             mapContainer.addEventListener('click', function(e) {
-                if (e.detail === 3) { // Тройной клик
+                if (e.detail === 3) {
                     calibrationOffset = 0;
                     lastAlpha = 0;
                 }
