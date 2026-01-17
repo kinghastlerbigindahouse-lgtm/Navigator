@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Навигатор">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Навигатор с загрузкой карт и построением маршрутов">
     <title>Навигатор</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -21,6 +30,7 @@
             height: 100vh;
             width: 100vw;
             position: relative;
+            -webkit-overflow-scrolling: touch;
         }
         
         .app-container {
@@ -31,6 +41,62 @@
             position: relative;
             background: #000;
             overflow: hidden;
+        }
+        
+        /* Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 15px;
+            z-index: 1000;
+            display: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .install-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 430px;
+            margin: 0 auto;
+        }
+        
+        .install-text {
+            font-size: 14px;
+            color: #fff;
+        }
+        
+        .install-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .install-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .install-primary {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .install-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
         
         /* Header */
@@ -103,7 +169,7 @@
             color: rgba(255, 255, 255, 0.5);
         }
         
-        /* Compass arrow - небольшая треугольная стрелка */
+        /* Compass arrow */
         .compass-arrow {
             position: absolute;
             top: 50%;
@@ -146,7 +212,7 @@
             100% { transform: scale(0.8); opacity: 0.5; }
         }
         
-        /* Route menu - компактное меню в углу */
+        /* Route menu */
         .route-menu {
             position: absolute;
             top: 15px;
@@ -568,9 +634,109 @@
             font-size: 11px;
             padding: 10px;
         }
+        
+        /* PWA splash screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .splash-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #007AFF, #00C6FF);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .splash-logo i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .splash-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .splash-loading {
+            width: 100px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .splash-loading-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #007AFF, #00C6FF);
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Debug info for orientation */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #4CD964;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            z-index: 1001;
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Debug info (можно удалить в production) -->
+    <div class="debug-info" id="debug-info"></div>
+    
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splash-screen">
+        <div class="splash-logo">
+            <i class="fas fa-compass"></i>
+        </div>
+        <div class="splash-title">Навигатор</div>
+        <div class="splash-loading">
+            <div class="splash-loading-bar"></div>
+        </div>
+    </div>
+    
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="install-prompt">
+        <div class="install-content">
+            <div class="install-text">Установить Навигатор?</div>
+            <div class="install-buttons">
+                <button class="install-btn install-secondary" id="install-cancel">Позже</button>
+                <button class="install-btn install-primary" id="install-confirm">Установить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main App -->
     <div class="app-container">
         <!-- Header -->
         <div class="header">
@@ -679,8 +845,90 @@
     </div>
 
     <script>
+        // PWA Configuration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+        
+        // Web App Manifest
+        const manifest = {
+            "name": "Навигатор",
+            "short_name": "Навигатор",
+            "description": "Навигатор с загрузкой карт и построением маршрутов",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#000000",
+            "theme_color": "#000000",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml"
+                },
+                {
+                    "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>",
+                    "sizes": "512x512",
+                    "type": "image/svg+xml"
+                }
+            ]
+        };
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // Элементы DOM
+            // PWA Elements
+            const splashScreen = document.getElementById('splash-screen');
+            const installPrompt = document.getElementById('install-prompt');
+            const installConfirm = document.getElementById('install-confirm');
+            const installCancel = document.getElementById('install-cancel');
+            const debugInfo = document.getElementById('debug-info');
+            
+            // Hide splash screen after load
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 500);
+            }, 1500);
+            
+            // PWA Installation
+            let deferredPrompt;
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                setTimeout(() => {
+                    if (!isAppInstalled()) {
+                        installPrompt.style.display = 'block';
+                    }
+                }, 3000);
+            });
+            
+            function isAppInstalled() {
+                return window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone === true;
+            }
+            
+            installConfirm.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installPrompt.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            });
+            
+            installCancel.addEventListener('click', () => {
+                installPrompt.style.display = 'none';
+            });
+            
+            // Main App Logic
             const compassArrow = document.getElementById('compass-arrow');
             const mapImage = document.getElementById('map-image');
             const defaultMap = document.getElementById('default-map');
@@ -703,7 +951,7 @@
             const navigationInfo = document.getElementById('navigation-info');
             const navigationProgress = document.getElementById('navigation-progress');
             
-            // Состояние приложения
+            // App State
             let currentRotation = 0;
             let targetRotation = 0;
             let isRouteSet = false;
@@ -716,13 +964,15 @@
             let currentStep = 0;
             let isSelectingPoints = false;
             let isMenuOpen = false;
+            let isRouteCompleted = false;
+            let lastPointPosition = null;
             
-            // Стрелка изначально смотрит острым углом вверх
+            // Initialize arrow - острый угол треугольника смотрит вверх
             currentRotation = 0;
             targetRotation = 0;
             compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
             
-            // Загрузка карты
+            // Load Map
             mapUpload.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -739,7 +989,7 @@
                 }
             });
             
-            // Вращение стрелки
+            // Arrow Rotation
             function rotateArrow() {
                 if (Math.abs(targetRotation - currentRotation) > 1) {
                     currentRotation += (targetRotation - currentRotation) * 0.05;
@@ -751,53 +1001,134 @@
                 requestAnimationFrame(rotateArrow);
             }
             
-            // Запуск анимации вращения
             rotateArrow();
             
-            // Обработка поворота устройства
+            // Device Orientation - ИСПРАВЛЕННАЯ ЛОГИКА
             let isDeviceOrientationSupported = false;
+            let calibrationOffset = 0;
+            let lastAlpha = 0;
             
             if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', function(event) {
-                    if (event.alpha !== null) {
-                        isDeviceOrientationSupported = true;
-                        targetRotation = 360 - event.alpha;
-                    }
-                });
-                
-                setTimeout(() => {
-                    if (!isDeviceOrientationSupported) {
-                        setupEmulatedRotation();
-                    }
-                }, 2000);
+                // Запрашиваем разрешение на доступ к датчикам (необходимо для iOS 13+)
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                startOrientationTracking();
+                            } else {
+                                setupEmulatedRotation();
+                            }
+                        })
+                        .catch(() => {
+                            setupEmulatedRotation();
+                        });
+                } else {
+                    // Для Android и старых iOS
+                    startOrientationTracking();
+                }
             } else {
                 setupEmulatedRotation();
             }
             
-            // Настройка эмулированного вращения
+            function startOrientationTracking() {
+                window.addEventListener('deviceorientation', handleOrientation);
+                isDeviceOrientationSupported = true;
+                debugInfo.style.display = 'block';
+                debugInfo.textContent = 'Датчик: активен';
+            }
+            
+            function handleOrientation(event) {
+                if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
+                    // alpha: поворот вокруг оси Z (0-360 градусов)
+                    // beta: наклон вперед/назад (-180 до 180)
+                    // gamma: наклон влево/вправо (-90 до 90)
+                    
+                    const alpha = event.alpha; // 0-360, где 0 = север
+                    const beta = event.beta;   // наклон вперед/назад
+                    const gamma = event.gamma; // наклон влево/вправо
+                    
+                    // Отладочная информация
+                    debugInfo.innerHTML = `
+                        α: ${alpha.toFixed(1)}°<br>
+                        β: ${beta.toFixed(1)}°<br>
+                        γ: ${gamma.toFixed(1)}°
+                    `;
+                    
+                    // Калибровка: при первом измерении запоминаем начальную ориентацию
+                    if (calibrationOffset === 0) {
+                        calibrationOffset = alpha;
+                    }
+                    
+                    // Вычисляем относительный поворот относительно начальной ориентации
+                    let relativeRotation = alpha - calibrationOffset;
+                    
+                    // Нормализуем угол в диапазоне 0-360
+                    if (relativeRotation < 0) relativeRotation += 360;
+                    if (relativeRotation >= 360) relativeRotation -= 360;
+                    
+                    // Плавное обновление
+                    const rotationChange = relativeRotation - lastAlpha;
+                    
+                    // Игнорируем резкие скачки
+                    if (Math.abs(rotationChange) < 30) {
+                        lastAlpha = relativeRotation;
+                        
+                        // Преобразуем поворот телефона в поворот стрелки
+                        // Когда телефон поворачивается вправо (по часовой), стрелка должна поворачиваться вправо
+                        // Острый угол треугольника должен указывать в направлении поворота
+                        targetRotation = relativeRotation;
+                    }
+                }
+            }
+            
+            // Калибровка по двойному тапу
+            mapContainer.addEventListener('dblclick', function() {
+                calibrationOffset = 0;
+                lastAlpha = 0;
+                debugInfo.textContent = 'Датчик: перекалиброван';
+            });
+            
             function setupEmulatedRotation() {
+                debugInfo.style.display = 'block';
+                debugInfo.textContent = 'Датчик: эмуляция';
+                
+                // Медленное вращение по умолчанию
                 setInterval(() => {
-                    if (!isNavigating) {
+                    if (!isNavigating && !isRouteCompleted) {
                         targetRotation += 0.2;
                     }
                 }, 100);
                 
-                mapContainer.addEventListener('click', function(e) {
-                    if (isSelectingPoints || e.target.closest('.route-menu') || e.target.closest('.menu-toggle')) return;
+                // Эмуляция поворота при свайпе по карте
+                let touchStartX = 0;
+                let touchStartRotation = 0;
+                
+                mapContainer.addEventListener('touchstart', function(e) {
+                    if (isSelectingPoints) return;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartRotation = targetRotation;
+                });
+                
+                mapContainer.addEventListener('touchmove', function(e) {
+                    if (isSelectingPoints || !touchStartX) return;
                     
-                    const rect = mapContainer.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const centerX = rect.width / 2;
+                    const touchCurrentX = e.touches[0].clientX;
+                    const deltaX = touchCurrentX - touchStartX;
                     
-                    if (clickX < centerX - 50) {
-                        targetRotation -= 25;
-                    } else if (clickX > centerX + 50) {
-                        targetRotation += 25;
-                    }
+                    // Поворачиваем стрелку в соответствии с движением пальца
+                    // Движение вправо = поворот вправо
+                    // Движение влево = поворот влево
+                    targetRotation = touchStartRotation + (deltaX * 0.5);
+                    
+                    e.preventDefault();
+                });
+                
+                mapContainer.addEventListener('touchend', function() {
+                    touchStartX = 0;
                 });
             }
             
-            // Выбор режима передвижения
+            // Travel Modes
             modeButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     modeButtons.forEach(btn => btn.classList.remove('active'));
@@ -806,7 +1137,7 @@
                 });
             });
             
-            // Открытие/закрытие меню маршрута
+            // Route Menu
             menuToggle.addEventListener('click', toggleRouteMenu);
             closeMenu.addEventListener('click', closeRouteMenu);
             
@@ -832,7 +1163,7 @@
                 hideRouteMarkers();
             }
             
-            // Добавление точек маршрута при клике на карту
+            // Add Route Points
             mapContainer.addEventListener('click', function(e) {
                 if (!isSelectingPoints || e.target.closest('.route-menu')) return;
                 
@@ -844,7 +1175,6 @@
                 updateRoutePointsList();
             });
             
-            // Добавление точки маршрута
             function addRoutePoint(x, y) {
                 const point = { x, y };
                 routePoints.push(point);
@@ -867,7 +1197,6 @@
                 }
             }
             
-            // Отрисовка линии между точками
             function drawLine(x1, y1, x2, y2) {
                 const line = document.createElement('div');
                 line.className = 'route-line';
@@ -890,7 +1219,6 @@
                 }
             }
             
-            // Обновление списка точек в меню
             function updateRoutePointsList() {
                 routePointsList.innerHTML = '';
                 
@@ -927,7 +1255,6 @@
                 });
             }
             
-            // Удаление точки маршрута
             function removeRoutePoint(index) {
                 routePoints.splice(index, 1);
                 
@@ -952,7 +1279,7 @@
                 updateRoutePointsList();
             }
             
-            // Очистка всех точек
+            // Clear Points
             clearPointsBtn.addEventListener('click', function() {
                 routePoints = [];
                 routeMarkers.forEach(marker => marker.remove());
@@ -961,10 +1288,14 @@
                 routeLines = [];
                 updateRoutePointsList();
                 isRouteSet = false;
+                isRouteCompleted = false;
                 routeNotification.classList.remove('active');
+                lastPointPosition = null;
+                compassArrow.style.left = '50%';
+                compassArrow.style.top = '50%';
+                compassArrow.style.transform = `translate(-50%, -50%) rotate(0deg)`;
             });
             
-            // Показать маркеры маршрута (только когда меню открыто и не во время навигации)
             function showRouteMarkers() {
                 if (!isNavigating) {
                     routeMarkers.forEach(marker => marker.style.display = 'block');
@@ -972,13 +1303,12 @@
                 }
             }
             
-            // Скрыть маркеры маршрута
             function hideRouteMarkers() {
                 routeMarkers.forEach(marker => marker.style.display = 'none');
                 routeLines.forEach(line => line.style.display = 'none');
             }
             
-            // Построение маршрута
+            // Build Route
             buildRouteBtn.addEventListener('click', function() {
                 if (routePoints.length < 2) {
                     alert('Добавьте как минимум 2 точки для построения маршрута');
@@ -986,9 +1316,11 @@
                 }
                 
                 isRouteSet = true;
+                isRouteCompleted = false;
+                lastPointPosition = null;
             });
             
-            // Поиск маршрута
+            // Search
             searchBtn.addEventListener('click', function() {
                 const destination = searchInput.value.trim();
                 if (destination) {
@@ -1006,6 +1338,8 @@
                         
                         updateRoutePointsList();
                         isRouteSet = true;
+                        isRouteCompleted = false;
+                        lastPointPosition = null;
                         
                         if (isMenuOpen && !isNavigating) {
                             showRouteMarkers();
@@ -1014,14 +1348,13 @@
                 }
             });
             
-            // Нажатие Enter в поле поиска
             searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     searchBtn.click();
                 }
             });
             
-            // Навигация по маршруту при клике на стрелку
+            // Navigation
             compassArrow.addEventListener('click', function() {
                 if (!isRouteSet) {
                     alert('Сначала постройте маршрут через меню маршрута (иконка в левом нижнем углу)');
@@ -1035,20 +1368,24 @@
                 }
             });
             
-            // Запуск навигации
             function startNavigation() {
                 if (routePoints.length < 2) return;
                 
                 isNavigating = true;
+                isRouteCompleted = false;
                 currentStep = 0;
                 navigationInfo.style.display = 'block';
                 
-                // Скрываем маркеры и линии во время движения стрелки
                 hideRouteMarkers();
                 
                 navigationInterval = setInterval(function() {
                     if (currentStep >= routePoints.length) {
                         stopNavigation();
+                        const lastPoint = routePoints[routePoints.length - 1];
+                        lastPointPosition = lastPoint;
+                        isRouteCompleted = true;
+                        compassArrow.style.left = `${lastPoint.x}px`;
+                        compassArrow.style.top = `${lastPoint.y}px`;
                         return;
                     }
                     
@@ -1058,12 +1395,18 @@
                     compassArrow.style.left = `${point.x}px`;
                     compassArrow.style.top = `${point.y}px`;
                     
-                    // Стрелка движется острым углом вперед по направлению к следующей точке
                     if (nextPoint) {
                         const dx = nextPoint.x - point.x;
                         const dy = nextPoint.y - point.y;
-                        // Острый угол треугольника смотрит вперед (угол -90 градусов для правильной ориентации)
-                        targetRotation = Math.atan2(dy, dx) * 180 / Math.PI - 90;
+                        // Стрелка смотрит острым углом в направлении движения
+                        targetRotation = Math.atan2(dy, dx) * 180 / Math.PI;
+                    } else {
+                        if (currentStep > 0) {
+                            const prevPoint = routePoints[currentStep - 1];
+                            const dx = point.x - prevPoint.x;
+                            const dy = point.y - prevPoint.y;
+                            targetRotation = Math.atan2(dy, dx) * 180 / Math.PI;
+                        }
                     }
                     
                     const progress = Math.round((currentStep / routePoints.length) * 100);
@@ -1073,31 +1416,43 @@
                 }, 1300);
             }
             
-            // Остановка навигации
             function stopNavigation() {
                 if (navigationInterval) {
                     clearInterval(navigationInterval);
+                    navigationInterval = null;
                 }
                 isNavigating = false;
                 navigationInfo.style.display = 'none';
                 
-                compassArrow.style.left = '50%';
-                compassArrow.style.top = '50%';
+                if (isRouteCompleted && lastPointPosition) {
+                    compassArrow.style.left = `${lastPointPosition.x}px`;
+                    compassArrow.style.top = `${lastPointPosition.y}px`;
+                } else if (!isRouteCompleted) {
+                    compassArrow.style.left = '50%';
+                    compassArrow.style.top = '50%';
+                }
+                
                 compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
                 
-                // Показываем маркеры только если меню открыто
                 if (isMenuOpen) {
                     showRouteMarkers();
                 }
             }
             
-            // Инициализация
+            // Initialize
             updateRoutePointsList();
             
-            // Закрытие меню при нажатии ESC
+            // Close menu on ESC
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && routeMenu.classList.contains('active')) {
                     closeRouteMenu();
+                }
+            });
+            
+            // Prevent context menu on long press
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.closest('.map-container')) {
+                    e.preventDefault();
                 }
             });
         });
