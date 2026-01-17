@@ -10,62 +10,38 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: #000;
             color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
         }
         
-        /* Скрытие панели браузера на iOS */
-        @supports (-webkit-touch-callout: none) {
-            body {
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-                padding-left: env(safe-area-inset-left);
-                padding-right: env(safe-area-inset-right);
-                min-height: -webkit-fill-available;
-                height: -webkit-fill-available;
-            }
-            
-            .container {
-                min-height: -webkit-fill-available;
-            }
-        }
-        
-        /* Предотвращение масштабирования */
-        body {
-            -webkit-text-size-adjust: 100%;
-            touch-action: manipulation;
-            overscroll-behavior: none;
-        }
-        
-        .container {
+        .app-container {
             width: 100%;
             height: 100%;
-            position: fixed;
+            max-width: 430px;
+            margin: 0 auto;
+            position: relative;
+            background: #000;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
         
-        /* Заголовок с логотипом */
+        /* Header */
         .header {
-            position: relative;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 0 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            position: relative;
+            z-index: 10;
         }
         
         .logo {
@@ -74,990 +50,1056 @@
             gap: 12px;
         }
         
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #007AFF, #0056cc);
+        .compass-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #007AFF, #00C6FF);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             color: white;
         }
         
-        .logo-text {
-            font-size: 26px;
+        .app-title {
             font-weight: 700;
-            background: linear-gradient(135deg, #007AFF, #34C759);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 0.5px;
+            font-size: 20px;
+            letter-spacing: -0.5px;
         }
         
-        /* Контейнер карты */
+        /* Map container */
         .map-container {
-            flex: 1;
-            position: relative;
-            background: #1a1a1a;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        #map-placeholder {
             width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0d1b2a, #1b263b);
-            color: #e0e1dd;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        #map-placeholder i {
-            font-size: 70px;
-            margin-bottom: 20px;
-            color: #007AFF;
-            opacity: 0.7;
-        }
-        
-        #map-placeholder h2 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        #map-placeholder p {
-            font-size: 16px;
-            max-width: 300px;
-            line-height: 1.5;
-            opacity: 0.8;
+            height: calc(100% - 140px);
+            position: relative;
+            overflow: hidden;
+            background: #0a0a0a;
+            cursor: crosshair;
         }
         
         #map-image {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             display: none;
         }
         
-        /* Треугольная стрелка навигации */
-        #nav-arrow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 85px;
-            height: 85px;
-            transform: translate(-50%, -50%) rotate(0deg);
-            transform-origin: center 30px;
-            z-index: 50;
-            transition: transform 0.3s ease-out;
-            filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.8));
-            pointer-events: none;
-            display: block;
-        }
-        
-        /* Мигающий круг вокруг стрелки */
-        .pulse-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 130px;
-            height: 130px;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            border: 4px solid rgba(0, 122, 255, 0.4);
-            animation: pulse 3s infinite ease-in-out;
-            z-index: 49;
-            pointer-events: none;
-        }
-        
-        @keyframes pulse {
-            0%, 100% {
-                transform: translate(-50%, -50%) scale(0.9);
-                opacity: 0.6;
-                border-width: 4px;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-                opacity: 0.3;
-                border-width: 2px;
-            }
-        }
-        
-        /* Кнопка загрузки карты */
-        .map-upload-container {
-            position: absolute;
-            bottom: 160px;
-            right: 20px;
-            width: 65px;
-            height: 65px;
-            z-index: 100;
-            cursor: pointer;
-        }
-        
-        .map-thumbnail {
+        .default-map {
             width: 100%;
             height: 100%;
-            border-radius: 16px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            overflow: hidden;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
             display: flex;
+            align-items: center;
+            justify-content: center;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-            transition: all 0.3s ease;
-        }
-        
-        .map-thumbnail:hover {
-            transform: scale(1.05);
-            border-color: rgba(0, 122, 255, 0.5);
-            box-shadow: 0 12px 30px rgba(0, 122, 255, 0.3);
-        }
-        
-        .map-thumbnail i {
-            font-size: 22px;
-            color: #007AFF;
-            margin-bottom: 3px;
-        }
-        
-        .map-thumbnail span {
-            font-size: 10px;
             color: rgba(255, 255, 255, 0.7);
-            text-align: center;
-            padding: 0 3px;
-        }
-        
-        #map-upload-input {
-            display: none;
-        }
-        
-        /* Панель поиска и транспорта */
-        .search-container {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(25px);
-            border-radius: 18px;
-            padding: 15px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-        
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .search-icon {
-            color: #007AFF;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        #search-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 17px;
-            padding: 12px 0;
-            outline: none;
-            letter-spacing: 0.3px;
-        }
-        
-        #search-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-        
-        .search-btn {
-            background: linear-gradient(135deg, #007AFF, #0056cc);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
-        }
-        
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
-        }
-        
-        .search-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* Панель транспорта без подписей */
-        .transport-panel {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        
-        .transport-btn {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.07);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 14px 5px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .transport-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
-        }
-        
-        .transport-btn.active {
-            background: rgba(0, 122, 255, 0.25);
-            border-color: #007AFF;
-            color: #007AFF;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
-        }
-        
-        /* Уведомление о маршруте - НЕ ИСЧЕЗАЕТ */
-        .route-notification {
-            position: absolute;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(30px);
-            border-radius: 16px;
-            padding: 18px 24px;
-            z-index: 200;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            max-width: 85%;
-            min-width: 280px;
-        }
-        
-        .route-notification.show {
-            opacity: 1;
-        }
-        
-        .route-notification i {
-            color: #34C759;
-            font-size: 26px;
-        }
-        
-        .route-text {
             font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
         }
         
-        .route-word {
-            color: #007AFF;
-            font-weight: 700;
+        .default-map i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.5);
         }
         
-        /* Индикатор компаса */
-        .compass-indicator {
-            position: absolute;
-            top: 80px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(15px);
-            border-radius: 12px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            z-index: 100;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .compass-value {
-            font-weight: 700;
-            color: #007AFF;
-            min-width: 45px;
-            text-align: center;
-            font-size: 16px;
-        }
-        
-        /* Индикатор загрузки */
-        .loading-indicator {
+        /* Compass arrow - небольшая треугольная стрелка */
+        .compass-arrow {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 25px 35px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            display: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
-        }
-        
-        .loading-indicator i {
-            font-size: 35px;
-            color: #007AFF;
-            margin-bottom: 15px;
-            animation: spin 1.2s linear infinite;
-        }
-        
-        .loading-indicator span {
-            font-size: 17px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Адаптивность для iPhone */
-        @media (max-width: 768px) {
-            .header {
-                height: 55px;
-                padding: 0 15px;
-            }
-            
-            .logo-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 20px;
-            }
-            
-            .logo-text {
-                font-size: 24px;
-            }
-            
-            .map-upload-container {
-                bottom: 150px;
-                right: 15px;
-                width: 60px;
-                height: 60px;
-            }
-            
-            .search-container {
-                left: 15px;
-                right: 15px;
-                bottom: 15px;
-                padding: 12px;
-                border-radius: 16px;
-            }
-            
-            .search-box {
-                gap: 12px;
-                margin-bottom: 12px;
-            }
-            
-            #search-input {
-                font-size: 16px;
-                padding: 10px 0;
-            }
-            
-            .search-btn {
-                padding: 10px 18px;
-                font-size: 15px;
-            }
-            
-            .transport-btn {
-                padding: 12px 5px;
-                font-size: 22px;
-                border-radius: 12px;
-            }
-            
-            .route-notification {
-                top: 70px;
-                padding: 15px 20px;
-                min-width: 260px;
-                border-radius: 14px;
-            }
-            
-            .route-notification i {
-                font-size: 22px;
-            }
-            
-            .route-text {
-                font-size: 16px;
-            }
-            
-            .compass-indicator {
-                top: 70px;
-                right: 15px;
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-            
-            .compass-value {
-                font-size: 15px;
-                min-width: 40px;
-            }
-            
-            #nav-arrow {
-                width: 75px;
-                height: 75px;
-            }
-            
-            .pulse-circle {
-                width: 115px;
-                height: 115px;
-            }
-            
-            #map-placeholder h2 {
-                font-size: 20px;
-            }
-            
-            #map-placeholder p {
-                font-size: 15px;
-            }
-        }
-        
-        /* iPhone X и новее - учет вырезов */
-        @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
-               only screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
-               only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
-               only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
-               only screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
-            .header {
-                padding-top: env(safe-area-inset-top);
-                height: calc(60px + env(safe-area-inset-top));
-            }
-            
-            .search-container {
-                margin-bottom: env(safe-area-inset-bottom);
-            }
-            
-            .route-notification {
-                top: calc(80px + env(safe-area-inset-top));
-            }
-            
-            .compass-indicator {
-                top: calc(80px + env(safe-area-inset-top));
-            }
-        }
-        
-        /* Предотвращение выделения текста */
-        * {
-            -webkit-user-select: none;
+            transform: translate(-50%, -50%) rotate(0deg);
+            width: 60px;
+            height: 60px;
+            z-index: 15;
+            transition: transform 0.2s ease-out, left 1.5s ease-in-out, top 1.5s ease-in-out;
+            cursor: pointer;
             user-select: none;
         }
         
-        input, textarea {
-            -webkit-user-select: text;
-            user-select: text;
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid #FF3B30;
+            position: relative;
+            filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.7));
+        }
+        
+        .triangle::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: -15px;
+            width: 30px;
+            height: 30px;
+            background: #FF3B30;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+        
+        /* Route menu - компактное меню в углу */
+        .route-menu {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 170px;
+            height: auto;
+            max-height: 75%;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 30;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .route-menu.active {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .route-header h2 {
+            font-size: 14px;
+            color: #007AFF;
+            font-weight: 600;
+        }
+        
+        .close-menu {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 14px;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .close-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .route-form {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .instruction {
+            background: rgba(0, 122, 255, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            color: #aaa;
+            line-height: 1.3;
+        }
+        
+        .instruction i {
+            color: #007AFF;
+            margin-right: 5px;
+        }
+        
+        .route-points-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            max-height: 110px;
+        }
+        
+        .route-point-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 11px;
+        }
+        
+        .route-point-item:last-child {
+            border-bottom: none;
+        }
+        
+        .point-coords {
+            font-size: 9px;
+            color: #777;
+        }
+        
+        .remove-point {
+            background: rgba(255, 59, 48, 0.2);
+            border: none;
+            color: #FF3B30;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .clear-points-btn {
+            padding: 7px;
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .build-route-btn {
+            padding: 9px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Route points on map */
+        .route-point-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #007AFF;
+            border-radius: 50%;
+            border: 2px solid white;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            box-shadow: 0 0 6px rgba(0, 122, 255, 0.8);
+        }
+        
+        .route-line {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+            display: none;
+            height: 2px;
+            background: linear-gradient(to right, #007AFF, #00C6FF);
+            transform-origin: 0 0;
+        }
+        
+        /* Search and controls */
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 10;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 45px 14px 40px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .search-input::placeholder {
+            color: #777;
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #007AFF;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+        }
+        
+        .search-btn i {
+            font-size: 14px;
+        }
+        
+        .travel-modes {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: #777;
+            font-size: 22px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn.active {
+            color: #007AFF;
+            background: rgba(0, 122, 255, 0.15);
+        }
+        
+        /* Map upload button */
+        .upload-map-btn {
+            position: absolute;
+            bottom: 170px;
+            right: 15px;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        .upload-map-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .upload-icon {
+            color: #777;
+            font-size: 20px;
+        }
+        
+        #map-upload {
+            display: none;
+        }
+        
+        /* Menu toggle button */
+        .menu-toggle {
+            position: absolute;
+            bottom: 170px;
+            left: 15px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Pulsating circle in search */
+        .search-container::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #007AFF;
+            border-radius: 50%;
+            animation: searchPulse 1.5s infinite;
+            z-index: 2;
+        }
+        
+        @keyframes searchPulse {
+            0% { opacity: 0.3; transform: translateY(-50%) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-50%) scale(1.1); box-shadow: 0 0 8px #007AFF; }
+            100% { opacity: 0.3; transform: translateY(-50%) scale(0.8); }
+        }
+        
+        /* Route notification */
+        .route-notification {
+            position: absolute;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.97);
+            border-left: 4px solid #4CD964;
+            padding: 12px 16px;
+            border-radius: 10px;
+            z-index: 25;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .route-notification.active {
+            display: block;
+            animation: notificationAppear 0.4s ease;
+        }
+        
+        @keyframes notificationAppear {
+            from { opacity: 0; top: 70px; }
+            to { opacity: 1; top: 85px; }
+        }
+        
+        .notification-title {
+            font-weight: 700;
+            color: #4CD964;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        
+        .notification-destination {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        /* Navigation progress indicator */
+        .navigation-info {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            z-index: 20;
+            font-size: 12px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .navigation-progress {
+            color: #4CD964;
+            font-weight: 700;
+        }
+        
+        /* Custom scrollbar */
+        .route-points-list::-webkit-scrollbar {
+            width: 3px;
+        }
+        
+        .route-points-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+        
+        .route-points-list::-webkit-scrollbar-thumb {
+            background: #007AFF;
+            border-radius: 2px;
+        }
+        
+        /* Empty message */
+        .empty-message {
+            text-align: center;
+            color: #777;
+            font-size: 11px;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Заголовок с логотипом компаса -->
+    <div class="app-container">
+        <!-- Header -->
         <div class="header">
             <div class="logo">
-                <div class="logo-icon">
+                <div class="compass-icon">
                     <i class="fas fa-compass"></i>
                 </div>
-                <div class="logo-text">Навигатор</div>
+                <div class="app-title">Навигатор</div>
             </div>
         </div>
         
-        <!-- Контейнер для карты -->
+        <!-- Map container -->
         <div class="map-container" id="map-container">
-            <div id="map-placeholder">
-                <i class="fas fa-map-marked-alt"></i>
-                <h2>Загрузите свою карту</h2>
-                <p>Используйте миниатюру в правом нижнем углу</p>
+            <div class="default-map" id="default-map">
+                <i class="fas fa-map"></i>
+                <p>Загрузите карту</p>
             </div>
             <img id="map-image" alt="Загруженная карта">
             
-            <!-- Мигающий круг вокруг стрелки -->
-            <div class="pulse-circle"></div>
+            <!-- Route notification -->
+            <div class="route-notification" id="route-notification">
+                <div class="notification-title">Маршрут построен</div>
+                <div class="notification-destination" id="destination-text"></div>
+            </div>
             
-            <!-- Треугольная стрелка навигации -->
-            <div id="nav-arrow">
-                <svg viewBox="0 0 100 100" fill="none">
-                    <!-- Большой треугольник с острым верхом -->
-                    <polygon points="50,15 30,75 70,75" fill="#FF3B30" stroke="#FF3B30" stroke-width="3"/>
-                    <!-- Внутренний треугольник для объема -->
-                    <polygon points="50,20 35,70 65,70" fill="#FF5757" stroke="#FF5757" stroke-width="1"/>
-                    <!-- Точка вращения вверху -->
-                    <circle cx="50" cy="30" r="7" fill="#FF3B30"/>
-                    <circle cx="50" cy="30" r="12" fill="rgba(255, 59, 48, 0.3)"/>
-                </svg>
+            <!-- Navigation progress -->
+            <div class="navigation-info" id="navigation-info">
+                Навигация: <span class="navigation-progress" id="navigation-progress">0%</span>
+            </div>
+            
+            <!-- Map upload button -->
+            <label for="map-upload" class="upload-map-btn" id="upload-btn">
+                <div class="upload-icon">
+                    <i class="fas fa-map"></i>
+                </div>
+                <img id="upload-preview" alt="Превью карты">
+            </label>
+            <input type="file" id="map-upload" accept="image/*">
+            
+            <!-- Menu toggle button -->
+            <div class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-route"></i>
+            </div>
+            
+            <!-- Compass arrow -->
+            <div class="compass-arrow" id="compass-arrow">
+                <div class="triangle"></div>
             </div>
         </div>
         
-        <!-- Уведомление о маршруте (НЕ ИСЧЕЗАЕТ) -->
-        <div class="route-notification" id="route-notification">
-            <i class="fas fa-check-circle"></i>
-            <div class="route-text">
-                Маршрут построен: <span class="route-word" id="route-word"></span>
-            </div>
-        </div>
-        
-        <!-- Индикатор компаса -->
-        <div class="compass-indicator">
-            <i class="fas fa-compass"></i>
-            <span>Направление:</span>
-            <div class="compass-value" id="compass-value">0° С</div>
-        </div>
-        
-        <!-- Кнопка загрузки карты -->
-        <div class="map-upload-container">
-            <div class="map-thumbnail" id="map-upload-btn">
-                <i class="fas fa-map"></i>
-                <span>Карта</span>
-            </div>
-            <input type="file" id="map-upload-input" accept="image/*">
-        </div>
-        
-        <!-- Панель поиска и транспорта -->
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" placeholder="Введите пункт назначения">
-                <button class="search-btn" id="search-go-btn">
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-container">
+                <input type="text" class="search-input" id="search-input" placeholder="Введите пункт назначения">
+                <button class="search-btn" id="search-btn">
                     <i class="fas fa-search"></i>
-                    Найти
                 </button>
             </div>
             
-            <div class="transport-panel">
-                <button class="transport-btn" id="transport-walk">
+            <div class="travel-modes">
+                <button class="mode-btn active" data-mode="walking">
                     <i class="fas fa-walking"></i>
                 </button>
-                <button class="transport-btn" id="transport-car">
+                <button class="mode-btn" data-mode="car">
                     <i class="fas fa-car"></i>
                 </button>
-                <button class="transport-btn" id="transport-bike">
+                <button class="mode-btn" data-mode="bicycle">
                     <i class="fas fa-bicycle"></i>
                 </button>
-                <button class="transport-btn" id="transport-bus">
+                <button class="mode-btn" data-mode="bus">
                     <i class="fas fa-bus"></i>
                 </button>
             </div>
         </div>
         
-        <!-- Индикатор загрузки -->
-        <div class="loading-indicator" id="loading-indicator">
-            <i class="fas fa-spinner"></i>
-            <span>Загрузка карты...</span>
+        <!-- Route menu -->
+        <div class="route-menu" id="route-menu">
+            <div class="route-header">
+                <h2>Маршрут</h2>
+                <button class="close-menu" id="close-menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="route-form">
+                <div class="instruction">
+                    <i class="fas fa-mouse-pointer"></i>
+                    Нажмите на карту для добавления точек
+                </div>
+                
+                <div class="route-points-list" id="route-points-list">
+                    <div class="empty-message" id="empty-points-message">Точки не добавлены</div>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button class="clear-points-btn" id="clear-points-btn">
+                        <i class="fas fa-trash"></i> Очистить
+                    </button>
+                    
+                    <button class="build-route-btn" id="build-route-btn">
+                        Построить маршрут
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Основные элементы DOM
-        const mapContainer = document.getElementById('map-container');
-        const mapPlaceholder = document.getElementById('map-placeholder');
-        const mapImage = document.getElementById('map-image');
-        const mapUploadBtn = document.getElementById('map-upload-btn');
-        const mapUploadInput = document.getElementById('map-upload-input');
-        const navArrow = document.getElementById('nav-arrow');
-        const searchInput = document.getElementById('search-input');
-        const searchGoBtn = document.getElementById('search-go-btn');
-        const compassValue = document.getElementById('compass-value');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const routeNotification = document.getElementById('route-notification');
-        const routeWord = document.getElementById('route-word');
-        
-        // Элементы транспорта
-        const transportWalk = document.getElementById('transport-walk');
-        const transportCar = document.getElementById('transport-car');
-        const transportBike = document.getElementById('transport-bike');
-        const transportBus = document.getElementById('transport-bus');
-        const transportButtons = [transportWalk, transportCar, transportBike, transportBus];
-        
-        // Переменные состояния
-        let currentRotation = 0;
-        let targetRotation = 0;
-        let isDeviceOrientationSupported = false;
-        let isMapLoaded = false;
-        let animationFrameId = null;
-        let lastOrientationUpdate = 0;
-        
-        // Инициализация приложения
-        function initApp() {
-            setupEventListeners();
-            updateCompassValue(0);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const compassArrow = document.getElementById('compass-arrow');
+            const mapImage = document.getElementById('map-image');
+            const defaultMap = document.getElementById('default-map');
+            const mapContainer = document.getElementById('map-container');
+            const mapUpload = document.getElementById('map-upload');
+            const uploadPreview = document.getElementById('upload-preview');
+            const uploadBtn = document.getElementById('upload-btn');
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const routeMenu = document.getElementById('route-menu');
+            const menuToggle = document.getElementById('menu-toggle');
+            const closeMenu = document.getElementById('close-menu');
+            const buildRouteBtn = document.getElementById('build-route-btn');
+            const clearPointsBtn = document.getElementById('clear-points-btn');
+            const routePointsList = document.getElementById('route-points-list');
+            const emptyPointsMessage = document.getElementById('empty-points-message');
+            const routeNotification = document.getElementById('route-notification');
+            const destinationText = document.getElementById('destination-text');
+            const navigationInfo = document.getElementById('navigation-info');
+            const navigationProgress = document.getElementById('navigation-progress');
             
-            // Активируем первую иконку транспорта (пешехода)
-            transportWalk.classList.add('active');
+            // Состояние приложения
+            let currentRotation = 0;
+            let targetRotation = 0;
+            let isRouteSet = false;
+            let routePoints = [];
+            let routeMarkers = [];
+            let routeLines = [];
+            let currentMode = 'walking';
+            let isNavigating = false;
+            let navigationInterval = null;
+            let currentStep = 0;
+            let isSelectingPoints = false;
+            let isMenuOpen = false;
             
-            // Начинаем анимацию плавного вращения
-            animateRotation();
+            // Стрелка изначально смотрит острым углом вверх
+            currentRotation = 0;
+            targetRotation = 0;
+            compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
             
-            // Показываем приветственное сообщение через 1 секунду
-            setTimeout(() => {
-                if (!isMapLoaded) {
-                    showRouteNotification('Добро пожаловать в Навигатор');
-                }
-            }, 1000);
-        }
-        
-        // Анимация плавного вращения
-        function animateRotation() {
-            // Плавная интерполяция к целевому вращению
-            const smoothing = 0.05; // Медленное плавное вращение
-            const rotationDiff = targetRotation - currentRotation;
-            
-            // Корректируем разницу для кратчайшего пути
-            let diff = rotationDiff;
-            if (Math.abs(rotationDiff) > 180) {
-                diff = rotationDiff - 360 * Math.sign(rotationDiff);
-            }
-            
-            // Плавное изменение текущего вращения
-            currentRotation += diff * smoothing;
-            
-            // Нормализация в диапазон 0-360
-            currentRotation = ((currentRotation % 360) + 360) % 360;
-            
-            // Обновление стрелки и компаса
-            updateArrowRotation(currentRotation);
-            updateCompassValue(currentRotation);
-            
-            // Продолжаем анимацию
-            animationFrameId = requestAnimationFrame(animateRotation);
-        }
-        
-        // Проверка поддержки ориентации
-        function checkOrientationSupport() {
-            if (window.DeviceOrientationEvent) {
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    // Для iOS 13+ - запрашиваем разрешение
-                    document.addEventListener('click', requestOrientationPermission, { once: true });
-                } else {
-                    // Для других устройств
-                    window.addEventListener('deviceorientation', handleDeviceOrientation);
-                    isDeviceOrientationSupported = true;
-                }
-            }
-        }
-        
-        // Запрос разрешения для iOS
-        function requestOrientationPermission() {
-            DeviceOrientationEvent.requestPermission()
-                .then(permissionState => {
-                    if (permissionState === 'granted') {
-                        window.addEventListener('deviceorientation', handleDeviceOrientation);
-                        isDeviceOrientationSupported = true;
-                    } else {
-                        console.log('Разрешение на использование датчиков отклонено');
-                    }
-                })
-                .catch(console.error);
-        }
-        
-        // Обработчик ориентации устройства
-        function handleDeviceOrientation(event) {
-            const now = Date.now();
-            
-            // Ограничиваем частоту обновлений для плавности
-            if (now - lastOrientationUpdate < 50) return;
-            lastOrientationUpdate = now;
-            
-            if (event.alpha !== null) {
-                // Для вращения через ВЕРХ используем альфа без инверсии
-                let newRotation = event.alpha;
-                
-                // Нормализация
-                if (newRotation < 0) newRotation += 360;
-                if (newRotation >= 360) newRotation -= 360;
-                
-                // Устанавливаем целевое вращение (будет плавно достигнуто в анимации)
-                targetRotation = newRotation;
-            }
-        }
-        
-        // Обновление вращения стрелки
-        function updateArrowRotation(rotation) {
-            navArrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-        }
-        
-        // Обновление значения компаса
-        function updateCompassValue(rotation) {
-            const roundedRotation = Math.round(rotation);
-            
-            // Определяем направление по сторонам света
-            let direction = '';
-            if (roundedRotation >= 338 || roundedRotation < 23) direction = 'С';
-            else if (roundedRotation >= 23 && roundedRotation < 68) direction = 'СВ';
-            else if (roundedRotation >= 68 && roundedRotation < 113) direction = 'В';
-            else if (roundedRotation >= 113 && roundedRotation < 158) direction = 'ЮВ';
-            else if (roundedRotation >= 158 && roundedRotation < 203) direction = 'Ю';
-            else if (roundedRotation >= 203 && roundedRotation < 248) direction = 'ЮЗ';
-            else if (roundedRotation >= 248 && roundedRotation < 293) direction = 'З';
-            else if (roundedRotation >= 293 && roundedRotation < 338) direction = 'СЗ';
-            
-            compassValue.textContent = `${roundedRotation}° ${direction}`;
-        }
-        
-        // Настройка обработчиков событий
-        function setupEventListeners() {
             // Загрузка карты
-            mapUploadBtn.addEventListener('click', () => {
-                mapUploadInput.click();
-            });
-            
-            mapUploadInput.addEventListener('change', handleMapUpload);
-            
-            // Поиск
-            searchGoBtn.addEventListener('click', performSearch);
-            
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    performSearch();
+            mapUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        mapImage.src = event.target.result;
+                        uploadPreview.src = event.target.result;
+                        mapImage.style.display = 'block';
+                        defaultMap.style.display = 'none';
+                        uploadPreview.style.display = 'block';
+                        uploadBtn.querySelector('.upload-icon').style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
             
-            // Фокус на поле ввода при касании
-            searchInput.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                searchInput.focus();
-            }, { passive: true });
+            // Вращение стрелки
+            function rotateArrow() {
+                if (Math.abs(targetRotation - currentRotation) > 1) {
+                    currentRotation += (targetRotation - currentRotation) * 0.05;
+                } else {
+                    currentRotation = targetRotation;
+                }
+                
+                compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+                requestAnimationFrame(rotateArrow);
+            }
             
-            // Выбор транспорта
-            transportButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    transportButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+            // Запуск анимации вращения
+            rotateArrow();
+            
+            // Обработка поворота устройства
+            let isDeviceOrientationSupported = false;
+            
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    if (event.alpha !== null) {
+                        isDeviceOrientationSupported = true;
+                        targetRotation = 360 - event.alpha;
+                    }
+                });
+                
+                setTimeout(() => {
+                    if (!isDeviceOrientationSupported) {
+                        setupEmulatedRotation();
+                    }
+                }, 2000);
+            } else {
+                setupEmulatedRotation();
+            }
+            
+            // Настройка эмулированного вращения
+            function setupEmulatedRotation() {
+                setInterval(() => {
+                    if (!isNavigating) {
+                        targetRotation += 0.2;
+                    }
+                }, 100);
+                
+                mapContainer.addEventListener('click', function(e) {
+                    if (isSelectingPoints || e.target.closest('.route-menu') || e.target.closest('.menu-toggle')) return;
                     
-                    // Показываем уведомление о выбранном транспорте
-                    const transportNames = {
-                        'transport-walk': 'пешком',
-                        'transport-car': 'автомобилем',
-                        'transport-bike': 'велосипедом',
-                        'transport-bus': 'автобусом'
-                    };
+                    const rect = mapContainer.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const centerX = rect.width / 2;
                     
-                    showRouteNotification(`Выбран маршрут ${transportNames[btn.id]}`);
+                    if (clickX < centerX - 50) {
+                        targetRotation -= 25;
+                    } else if (clickX > centerX + 50) {
+                        targetRotation += 25;
+                    }
+                });
+            }
+            
+            // Выбор режима передвижения
+            modeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    modeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentMode = this.getAttribute('data-mode');
                 });
             });
             
-            // Запускаем проверку ориентации при первом взаимодействии
-            document.addEventListener('click', () => {
-                checkOrientationSupport();
-            }, { once: true });
+            // Открытие/закрытие меню маршрута
+            menuToggle.addEventListener('click', toggleRouteMenu);
+            closeMenu.addEventListener('click', closeRouteMenu);
             
-            // Предотвращение стандартных жестов браузера
-            document.addEventListener('touchmove', (e) => {
-                if (e.scale !== 1) {
-                    e.preventDefault();
+            function toggleRouteMenu() {
+                if (isMenuOpen) {
+                    closeRouteMenu();
+                } else {
+                    openRouteMenu();
                 }
-            }, { passive: false });
+            }
             
-            // Предотвращение контекстного меню
-            document.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                return false;
+            function openRouteMenu() {
+                routeMenu.classList.add('active');
+                isSelectingPoints = true;
+                isMenuOpen = true;
+                showRouteMarkers();
+            }
+            
+            function closeRouteMenu() {
+                routeMenu.classList.remove('active');
+                isSelectingPoints = false;
+                isMenuOpen = false;
+                hideRouteMarkers();
+            }
+            
+            // Добавление точек маршрута при клике на карту
+            mapContainer.addEventListener('click', function(e) {
+                if (!isSelectingPoints || e.target.closest('.route-menu')) return;
+                
+                const rect = mapContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                addRoutePoint(x, y);
+                updateRoutePointsList();
             });
-        }
-        
-        // Выполнение поиска
-        function performSearch() {
-            const query = searchInput.value.trim();
             
-            if (query) {
-                showRouteNotification(query);
-                searchInput.value = '';
+            // Добавление точки маршрута
+            function addRoutePoint(x, y) {
+                const point = { x, y };
+                routePoints.push(point);
                 
-                // Фокус убираем с поля ввода
-                searchInput.blur();
-            } else {
-                showRouteNotification('Введите пункт назначения');
-            }
-        }
-        
-        // Показать уведомление о маршруте (НЕ ИСЧЕЗАЕТ)
-        function showRouteNotification(word) {
-            routeWord.textContent = word;
-            routeNotification.classList.add('show');
-            
-            // Уведомление НЕ исчезает автоматически
-            // Оно останется на экране до следующего действия пользователя
-        }
-        
-        // Загрузка пользовательской карты
-        function handleMapUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            // Проверяем тип файла
-            if (!file.type.match('image.*')) {
-                showRouteNotification('Выберите изображение');
-                return;
+                const marker = document.createElement('div');
+                marker.className = 'route-point-marker';
+                marker.style.left = `${x}px`;
+                marker.style.top = `${y}px`;
+                marker.setAttribute('data-index', routePoints.length - 1);
+                mapContainer.appendChild(marker);
+                routeMarkers.push(marker);
+                
+                if (routePoints.length > 1) {
+                    const prevPoint = routePoints[routePoints.length - 2];
+                    drawLine(prevPoint.x, prevPoint.y, x, y);
+                }
+                
+                if (isMenuOpen && !isNavigating) {
+                    marker.style.display = 'block';
+                }
             }
             
-            loadingIndicator.style.display = 'flex';
+            // Отрисовка линии между точками
+            function drawLine(x1, y1, x2, y2) {
+                const line = document.createElement('div');
+                line.className = 'route-line';
+                
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                line.style.width = `${length}px`;
+                line.style.left = `${x1}px`;
+                line.style.top = `${y1}px`;
+                line.style.transform = `rotate(${angle}deg)`;
+                
+                mapContainer.appendChild(line);
+                routeLines.push(line);
+                
+                if (isMenuOpen && !isNavigating) {
+                    line.style.display = 'block';
+                }
+            }
             
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                loadingIndicator.style.display = 'none';
-                mapImage.src = event.target.result;
-                mapImage.style.display = 'block';
-                mapPlaceholder.style.display = 'none';
-                isMapLoaded = true;
-                updateMapThumbnail(event.target.result);
-                showRouteNotification('Карта успешно загружена');
-            };
+            // Обновление списка точек в меню
+            function updateRoutePointsList() {
+                routePointsList.innerHTML = '';
+                
+                if (routePoints.length === 0) {
+                    emptyPointsMessage.style.display = 'block';
+                    return;
+                }
+                
+                emptyPointsMessage.style.display = 'none';
+                
+                routePoints.forEach((point, index) => {
+                    const pointItem = document.createElement('div');
+                    pointItem.className = 'route-point-item';
+                    
+                    pointItem.innerHTML = `
+                        <div>
+                            <strong>Точка ${index + 1}</strong>
+                            <div class="point-coords">${Math.round(point.x)}×${Math.round(point.y)}</div>
+                        </div>
+                        <button class="remove-point" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    routePointsList.appendChild(pointItem);
+                });
+                
+                document.querySelectorAll('.remove-point').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeRoutePoint(index);
+                    });
+                });
+            }
             
-            reader.onerror = function() {
-                loadingIndicator.style.display = 'none';
-                showRouteNotification('Ошибка загрузки карты');
-            };
+            // Удаление точки маршрута
+            function removeRoutePoint(index) {
+                routePoints.splice(index, 1);
+                
+                if (routeMarkers[index]) {
+                    routeMarkers[index].remove();
+                    routeMarkers.splice(index, 1);
+                }
+                
+                routeLines.forEach(line => line.remove());
+                routeLines = [];
+                
+                for (let i = 1; i < routePoints.length; i++) {
+                    const prevPoint = routePoints[i - 1];
+                    const currentPoint = routePoints[i];
+                    drawLine(prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
+                }
+                
+                routeMarkers.forEach((marker, i) => {
+                    marker.setAttribute('data-index', i);
+                });
+                
+                updateRoutePointsList();
+            }
             
-            reader.readAsDataURL(file);
-        }
-        
-        // Обновление миниатюры карты
-        function updateMapThumbnail(imageSrc) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+            // Очистка всех точек
+            clearPointsBtn.addEventListener('click', function() {
+                routePoints = [];
+                routeMarkers.forEach(marker => marker.remove());
+                routeMarkers = [];
+                routeLines.forEach(line => line.remove());
+                routeLines = [];
+                updateRoutePointsList();
+                isRouteSet = false;
+                routeNotification.classList.remove('active');
+            });
+            
+            // Показать маркеры маршрута (только когда меню открыто и не во время навигации)
+            function showRouteMarkers() {
+                if (!isNavigating) {
+                    routeMarkers.forEach(marker => marker.style.display = 'block');
+                    routeLines.forEach(line => line.style.display = 'block');
+                }
+            }
+            
+            // Скрыть маркеры маршрута
+            function hideRouteMarkers() {
+                routeMarkers.forEach(marker => marker.style.display = 'none');
+                routeLines.forEach(line => line.style.display = 'none');
+            }
+            
+            // Построение маршрута
+            buildRouteBtn.addEventListener('click', function() {
+                if (routePoints.length < 2) {
+                    alert('Добавьте как минимум 2 точки для построения маршрута');
+                    return;
+                }
                 
-                const size = 120; // Большой размер для качества
-                canvas.width = size;
-                canvas.height = size;
-                
-                // Рисуем с обрезкой для квадрата
-                const minSize = Math.min(img.width, img.height);
-                const sourceX = (img.width - minSize) / 2;
-                const sourceY = (img.height - minSize) / 2;
-                
-                ctx.drawImage(img, sourceX, sourceY, minSize, minSize, 0, 0, size, size);
-                
-                // Создаем круглую маску для миниатюры
-                const roundedCanvas = document.createElement('canvas');
-                roundedCanvas.width = size;
-                roundedCanvas.height = size;
-                const roundedCtx = roundedCanvas.getContext('2d');
-                
-                // Рисуем круг
-                roundedCtx.beginPath();
-                roundedCtx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
-                roundedCtx.closePath();
-                roundedCtx.clip();
-                
-                // Рисуем изображение внутри круга
-                roundedCtx.drawImage(canvas, 0, 0);
-                
-                mapUploadBtn.style.background = `url(${roundedCanvas.toDataURL()}) center/cover`;
-                mapUploadBtn.querySelector('i').style.display = 'none';
-                mapUploadBtn.querySelector('span').style.display = 'none';
-            };
-            img.src = imageSrc;
-        }
-        
-        // Для тестирования на десктопе
-        if (!window.DeviceOrientationEvent) {
-            // Обработчики клавиш для тестирования вращения
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') {
-                    targetRotation = (targetRotation - 15) % 360;
-                    if (targetRotation < 0) targetRotation += 360;
-                } else if (e.key === 'ArrowRight') {
-                    targetRotation = (targetRotation + 15) % 360;
+                isRouteSet = true;
+            });
+            
+            // Поиск маршрута
+            searchBtn.addEventListener('click', function() {
+                const destination = searchInput.value.trim();
+                if (destination) {
+                    destinationText.textContent = destination;
+                    routeNotification.classList.add('active');
+                    
+                    if (routePoints.length === 0) {
+                        const rect = mapContainer.getBoundingClientRect();
+                        
+                        for (let i = 0; i < 4; i++) {
+                            const x = Math.random() * (rect.width - 80) + 40;
+                            const y = Math.random() * (rect.height - 80) + 40;
+                            addRoutePoint(x, y);
+                        }
+                        
+                        updateRoutePointsList();
+                        isRouteSet = true;
+                        
+                        if (isMenuOpen && !isNavigating) {
+                            showRouteMarkers();
+                        }
+                    }
                 }
             });
             
-            // Вращение перетаскиванием
-            let isDragging = false;
-            let startX = 0;
-            let startTargetRotation = 0;
-            
-            mapContainer.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                startX = e.clientX;
-                startTargetRotation = targetRotation;
+            // Нажатие Enter в поле поиска
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchBtn.click();
+                }
             });
             
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
+            // Навигация по маршруту при клике на стрелку
+            compassArrow.addEventListener('click', function() {
+                if (!isRouteSet) {
+                    alert('Сначала постройте маршрут через меню маршрута (иконка в левом нижнем углу)');
+                    return;
+                }
                 
-                const deltaX = e.clientX - startX;
-                const rotationDelta = deltaX * 0.3;
-                
-                targetRotation = (startTargetRotation + rotationDelta) % 360;
-                if (targetRotation < 0) targetRotation += 360;
+                if (!isNavigating) {
+                    startNavigation();
+                } else {
+                    stopNavigation();
+                }
             });
             
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
-            
-            // Тач события
-            mapContainer.addEventListener('touchstart', (e) => {
-                isDragging = true;
-                startX = e.touches[0].clientX;
-                startTargetRotation = targetRotation;
-                e.preventDefault();
-            }, { passive: false });
-            
-            document.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
+            // Запуск навигации
+            function startNavigation() {
+                if (routePoints.length < 2) return;
                 
-                const deltaX = e.touches[0].clientX - startX;
-                const rotationDelta = deltaX * 0.3;
+                isNavigating = true;
+                currentStep = 0;
+                navigationInfo.style.display = 'block';
                 
-                targetRotation = (startTargetRotation + rotationDelta) % 360;
-                if (targetRotation < 0) targetRotation += 360;
-                e.preventDefault();
-            }, { passive: false });
-            
-            document.addEventListener('touchend', () => {
-                isDragging = false;
-            });
-        }
-        
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', initApp);
-        
-        // Предотвращение выхода из полноэкранного режима на iOS
-        document.addEventListener('touchstart', function(e) {
-            if (e.touches.length > 1) {
-                e.preventDefault();
+                // Скрываем маркеры и линии во время движения стрелки
+                hideRouteMarkers();
+                
+                navigationInterval = setInterval(function() {
+                    if (currentStep >= routePoints.length) {
+                        stopNavigation();
+                        return;
+                    }
+                    
+                    const point = routePoints[currentStep];
+                    const nextPoint = routePoints[currentStep + 1];
+                    
+                    compassArrow.style.left = `${point.x}px`;
+                    compassArrow.style.top = `${point.y}px`;
+                    
+                    // Стрелка движется острым углом вперед по направлению к следующей точке
+                    if (nextPoint) {
+                        const dx = nextPoint.x - point.x;
+                        const dy = nextPoint.y - point.y;
+                        // Острый угол треугольника смотрит вперед (угол -90 градусов для правильной ориентации)
+                        targetRotation = Math.atan2(dy, dx) * 180 / Math.PI - 90;
+                    }
+                    
+                    const progress = Math.round((currentStep / routePoints.length) * 100);
+                    navigationProgress.textContent = `${progress}%`;
+                    
+                    currentStep++;
+                }, 1300);
             }
-        }, { passive: false });
-        
-        // Сохранение состояния при выходе из приложения
-        window.addEventListener('beforeunload', function() {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
+            
+            // Остановка навигации
+            function stopNavigation() {
+                if (navigationInterval) {
+                    clearInterval(navigationInterval);
+                }
+                isNavigating = false;
+                navigationInfo.style.display = 'none';
+                
+                compassArrow.style.left = '50%';
+                compassArrow.style.top = '50%';
+                compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+                
+                // Показываем маркеры только если меню открыто
+                if (isMenuOpen) {
+                    showRouteMarkers();
+                }
             }
+            
+            // Инициализация
+            updateRoutePointsList();
+            
+            // Закрытие меню при нажатии ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && routeMenu.classList.contains('active')) {
+                    closeRouteMenu();
+                }
+            });
         });
     </script>
 </body>
