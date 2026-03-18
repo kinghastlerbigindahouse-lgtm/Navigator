@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAFE CRACKER // TERMINAL v8.3 (CLEAN INTERFACE)</title>
+    <title>SAFE CRACKER // TERMINAL v8.4 (CLEAN INTERFACE)</title>
     <!-- Упрощенный манифест для PWA -->
     <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Safe%20Cracker%20Clean%22%2C%22short_name%22%3A%22CrackerClean%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000%22%2C%22theme_color%22%3A%22%2300ff00%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAulJREFUWIXtl01oE0EUx%2F83m7Qp2iRtxIJUpPVSamu1iGcrKN6KehI8ifUgxIOiFz1UKigitV5E8CAieBCk3lqklXoWehARRCpWk5BNDrsfbrMfbrLdzW6ySTfNQZv%2B4bG8efPmtzP7Zt4b4H%2BOJb8KIpGIGY1GkUqlkEwmMRKJwOv1wuv1wuVyweFwwG63w2q1wmKxwGQywWg0Qq/XC73RqF8GAGO1WsVyuYxSqYRCoYBMJoNMJoPpdBpOp7PT5mazGRzHwWQywWw2w2KxwOFwwOv1IhAIwO/3w%2BVySZZt2i6Xy2IymcB4PI7xeBwajQYqlQrL5TKWyyWWy2WUy2UUi0Xk83lkMhmkUikkk0nEYjHE43Gk02nk83lUq1U0Gg1Uq1U0Gg2Uy2UUi8XkcjnMZrMYDAbw%2BXyw2WwYDAZx%2B4vFAs1mE%2FV6HdVqFeVyGcViEZlMBh6PBw6HQ8R0Oh2sVitcLhf8fj%2BCwSBCoRBCoRACgQDsdvu6vCqVChaLBebzOWazGWazGUajEQaDAa1WC41GA7VaDbVaDdlsFpPJBD6fD6vVCoPBgE6ng2q1ikqlgnw%2Bj8lkgtVqBZfLhUajgWazKZbVZDLBarXC6/V2AeFwGG63G0ajcU0er9e7Op1O5PN5ZLNZpNNpJBIJxGIxxONxJBIJpFIpZDIZ5PN5lEolVCoVVKtVVCoVVCoVFItF5HI5zGYzjMfj7o1bLBa%2Bc6P%2FG5hOp2g0GqjVaqhWq2i1WhiNRtBqtVCpVFAoFJDL5TAajdDr9dDr9dDpdNDr9TAYDDCZTDCbzTCbzbBYLLBarXC73fD7%2FQgEAggGg4hEIsjn80in08hkMphMJh2HjUYDJpMJer0eer1e7Bw%2B4k6nE4FAAOFwGJFIBNFoFJFIBA6HY33CtwVYLBYUCoXuK2i326jVaqhUKigWiyiVSlitVjAYDDCZTDCbzR0mLLDZbLDb7XA6nXC5XPB4PPD5fAgEAgiHw4hEIuLP4s%2BLiMfjSCaTSCaTSCQSSKfTyGQy4iSMx%2BOYzWYwGo3Q6XTQ6XTQaDQi5mbQarUwmUwwm80wmUwiboN%2Bvw8A8I8H8C8DAL6%2BvoLneUwmE0SjUXAch3A4jGAwiEAgAI7j4Pf7xVnC83zn78E7C6vVKoxGIwwGww8Tb0ajUcC27R%2F%2Bw0Wj0QjD4fAPe%2F4Dp9P5G8dxmEwm%2BJY6nU7A6XTK7vsWYHd3F%2B%2FfvwcAfHx8hGVZ7OzsIBgMdmazWq3iOA7b29t9%2B%2F4F6s27A9F9bu4AAAAASUVORK5CYII%3D%22%2C%22sizes%22%3A%2232x32%22%7D%5D%7D">
     <style>
@@ -483,7 +483,7 @@
     <div class="crt-frame" id="app">
         <div class="scan-line"></div>
         <div class="terminal-header">
-            <span>🔒 SAFE CRACKER v.8.3 [<span id="timeSettingDisplay">30</span>s]</span>
+            <span>🔒 SAFE CRACKER v.8.4 [<span id="timeSettingDisplay">30</span>s]</span>
             <span>
                 STATUS: <span class="blink-led" style="display: inline-block; vertical-align: middle; margin-left: 8px;"></span> ONLINE
                 <button class="settings-btn" id="settingsBtn">⚙️</button>
@@ -703,8 +703,8 @@
                 // Прогресс бар на 100%
                 progressBar.style.width = '100%';
                 
-                // Обновляем статус
-                statusEl.textContent = '🔓 [ ВЗЛОМАН ] КОД 090892 ПРИНЯТ 🔓';
+                // Обновляем статус (убрано слово "ПРИНЯТ")
+                statusEl.textContent = '🔓 [ ВЗЛОМАН ] КОД 090892 🔓';
                 statusEl.style.color = '#ffff00';
                 foundSpan.textContent = FIXED_TARGET_CODE.join('');
                 foundSpan.classList.add('code-found');
